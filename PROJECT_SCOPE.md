@@ -179,6 +179,18 @@ execution layer powering that transformation.
 
 <!-- SCOPE-SYNC: keep this section in sync with the actual code. Updated by the Stop hook + /init command. -->
 
+- **2026-07-07 (Step 5 — undocumented-API ingestion, for real):** the "only a text document"
+  path is no longer a mock. Engine `ingestion.infer_from_doc` feeds pasted human-written docs to
+  the model under a validate-and-repair contract (`complete_json`) and extracts a callable
+  operation list; unusable docs are refused honestly rather than fabricated (Doctrine #4/#8).
+  `POST /systems` accepts `doc` OR `spec_url`; both flow through the same tool-build + capability
+  eval + knowledge index. The deck's AddSystemPanel text mode now couples for real when the
+  engine is live (base URL captured for execution). Verified: `python -m eval.ingest_check` 5/5;
+  intent harness still 9/9 (no regression from the `ingest_spec` refactor). Also recorded an
+  architectural-stance note in `../mimir-engine/AGENTS.md` ("Deliberately NOT building"):
+  rejected premature multi-agent/graph-DB/code-AST/model-bumping; queued role-scoped authZ and a
+  memory taxonomy as in-scope borrows, each gated behind a harness case.
+
 - **2026-07-06:** Full front-end shell built (no backend yet, all data from `app/lib/mock-data.ts`):
   landing (`/`, `/platform`, `/security`), auth (`/login`, `/signup` — "operator handshake",
   `/logout` — session-seal screen),

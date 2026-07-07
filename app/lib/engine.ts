@@ -187,7 +187,8 @@ export interface BusinessContext {
 
 export async function engineCoupleSystem(
   name: string,
-  specUrl: string,
+  // documented API → specUrl; undocumented API → doc (pasted human-written docs)
+  source: { specUrl?: string; doc?: string },
   baseUrl: string,
   auth?: CoupleAuth,
   context?: BusinessContext
@@ -196,7 +197,14 @@ export async function engineCoupleSystem(
     const res = await fetch(`${ENGINE_URL}/systems`, {
       method: "POST",
       headers: authHeaders({ "content-type": "application/json" }),
-      body: JSON.stringify({ name, spec_url: specUrl, base_url: baseUrl, auth, context }),
+      body: JSON.stringify({
+        name,
+        base_url: baseUrl,
+        spec_url: source.specUrl,
+        doc: source.doc,
+        auth,
+        context,
+      }),
     });
     if (!res.ok) return null;
     return (await res.json()) as { id: string; name: string; tool_count: number };

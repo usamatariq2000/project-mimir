@@ -40,7 +40,9 @@ export default function AddSystemPanel({
 
   const canEvaluate =
     name.trim().length > 1 &&
-    (mode === "openapi" ? specUrl.trim().length > 5 : notes.trim().length > 20);
+    (mode === "openapi"
+      ? specUrl.trim().length > 5
+      : notes.trim().length > 20 && (!engineLive || baseUrl.trim().length > 5));
 
   const couple = async () => {
     if (!result) return;
@@ -68,7 +70,7 @@ export default function AddSystemPanel({
       };
       const real = await engineCoupleSystem(
         name.trim(),
-        specUrl.trim(),
+        { specUrl: specUrl.trim() },
         baseUrl.trim() || new URL(specUrl.trim()).origin,
         authCfg,
         ctx
@@ -82,7 +84,27 @@ export default function AddSystemPanel({
       setCoupleError("The engine could not ingest that spec — check the URL is reachable.");
       return;
     }
-    // offline / text-doc path: local only (server-side text ingestion is on the roadmap)
+    // text-doc + live engine → REAL coupling: the model infers tools from the prose
+    if (mode === "text" && engineLive) {
+      setCoupling(true);
+      setCoupleError(null);
+      const real = await engineCoupleSystem(
+        name.trim(),
+        { doc: notes.trim() },
+        baseUrl.trim()
+      );
+      setCoupling(false);
+      if (real) {
+        await onCoupled?.();
+        onClose();
+        return;
+      }
+      setCoupleError(
+        "The engine could not infer any operations from those docs — add clearer endpoint/method details, or connect an OpenAPI spec."
+      );
+      return;
+    }
+    // offline path: local only (needs a live engine to infer tools from docs)
     onAdd({
       id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       name: name.trim(),
@@ -250,13 +272,27 @@ export default function AddSystemPanel({
                 </div>
               </div>
             ) : (
-              <textarea
-                className="field min-h-28 font-mono"
-                placeholder={"Paste whatever exists — e.g.\n“to book a shipment POST the order payload to /shipments, tracking is at /track with the ref, rates can be queried per zone…”"}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                aria-label="API notes text"
-              />
+              <div className="space-y-2">
+                <textarea
+                  className="field min-h-28 font-mono"
+                  placeholder={"Paste whatever exists — e.g.\n“to book a shipment POST the order payload to /shipments, tracking is at /track with the ref, rates can be queried per zone…”"}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  aria-label="API notes text"
+                />
+                <input
+                  className="field font-mono"
+                  placeholder="API base URL for execution (e.g. https://api.vendor.com)"
+                  value={baseUrl}
+                  onChange={(e) => setBaseUrl(e.target.value)}
+                  aria-label="API base URL"
+                />
+                {engineLive && (
+                  <p className="font-mono text-[0.62rem] uppercase tracking-wider text-acid">
+                    ● engine live — the model will read these notes and infer real tools
+                  </p>
+                )}
+              </div>
             )}
           </div>
 

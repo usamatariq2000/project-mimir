@@ -1,0 +1,69 @@
+- generic [ref=f2e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f2e3]:
+    - banner [ref=f2e4]:
+      - generic [ref=f2e5]:
+        - link "MIMIR DECK" [ref=f2e6]:
+          - /url: /
+          - generic [ref=f2e8]: MIMIR DECK
+        - generic [ref=f2e9]:
+          - button "Deck" [pressed] [ref=f2e10]
+          - button "Monitor" [ref=f2e11]
+      - generic [ref=f2e12]:
+        - button "?" [ref=f2e13]
+        - generic [ref=f2e14]: 1 systems · engine live
+        - generic [ref=f2e16]: Eval Bot
+        - button "⏻ Log out" [ref=f2e17]:
+          - text: ⏻
+          - generic [ref=f2e18]: Log out
+    - dialog "Couple a new system" [ref=f2e64]:
+      - generic [ref=f2e65]:
+        - generic [ref=f2e66]:
+          - paragraph [ref=f2e67]: Couple a new system
+          - button "✕ close" [ref=f2e68]
+        - generic [ref=f2e69]:
+          - generic [ref=f2e70]: System name
+          - textbox "System name" [ref=f2e71]:
+            - /placeholder: e.g. Shipmate (our logistics vendor)
+            - text: Vague Vendor
+          - paragraph [ref=f2e72]: How is its API documented?
+          - generic [ref=f2e73]:
+            - button "OpenAPI / Swagger A proper spec exists. Fast, exact." [ref=f2e74]:
+              - paragraph [ref=f2e75]: OpenAPI / Swagger
+              - paragraph [ref=f2e76]: A proper spec exists. Fast, exact.
+            - button "Only a text document Notes, a wiki page, an email. Mimir reads it and infers the tools." [active] [pressed] [ref=f2e77]:
+              - paragraph [ref=f2e78]: Only a text document
+              - paragraph [ref=f2e79]: Notes, a wiki page, an email. Mimir reads it and infers the tools.
+          - generic [ref=f2e81]:
+            - textbox "API notes text" [ref=f2e98]:
+              - /placeholder: "Paste whatever exists — e.g.\n“to book a shipment POST the order payload to /shipments, tracking is at /track with the ref, rates can be queried per zone…”"
+            - textbox "API base URL" [ref=f2e83]:
+              - /placeholder: API base URL (optional — the commissioning interview will ask if omitted)
+            - paragraph [ref=f2e84]: ● engine live — the model reads your notes, then confirms its reading with you before committing
+          - button "Commission this system" [disabled] [ref=f2e99]
+    - main [ref=f2e19]:
+      - paragraph [ref=f2e20]: Operating all systems
+      - heading "State your intent." [level=1] [ref=f2e21]
+      - generic [ref=f2e23]:
+        - generic [ref=f2e24]: ❯
+        - textbox "Intent" [ref=f2e25]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=f2e26]
+      - list [ref=f2e27]:
+        - listitem [ref=f2e28]:
+          - button "Refund every failed payment from yesterday" [ref=f2e29]
+        - listitem [ref=f2e30]:
+          - button "Which products will run out of stock this week?" [ref=f2e31]
+        - listitem [ref=f2e32]:
+          - button "Close all resolved tickets older than 7 days" [ref=f2e33]
+    - contentinfo [ref=f2e34]:
+      - generic [ref=f2e35]: Systems
+      - button "Acme Commerce" [ref=f2e61]: Acme Commerce
+      - button "+ couple a system" [ref=f2e42]
+  - button "Open Next.js Dev Tools" [ref=f2e48] [cursor=pointer]:
+    - img [ref=f2e49]
+  - alert [ref=f2e63]

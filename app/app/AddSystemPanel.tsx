@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import ApiEvaluation, { type EvalResult } from "../components/ApiEvaluation";
-import { engineCoupleSystem, type CoupleAuth, type BusinessContext } from "../lib/engine";
+import CommissioningTerminal from "./CommissioningTerminal";
+import {
+  engineCoupleSystem,
+  engineDraftSystem,
+  type CoupleAuth,
+  type BusinessContext,
+  type DraftInterpretation,
+} from "../lib/engine";
 import type { ConnectedSystem } from "../lib/mock-data";
 
 /* Coupling a new system from the deck. Two ways in: a proper OpenAPI spec,
@@ -37,12 +44,14 @@ export default function AddSystemPanel({
   const [coupleError, setCoupleError] = useState<string | null>(null);
   const [evaluating, setEvaluating] = useState(false);
   const [result, setResult] = useState<EvalResult | null>(null);
+  const [draft, setDraft] = useState<DraftInterpretation | null>(null);
+  const [drafting, setDrafting] = useState(false);
 
   const canEvaluate =
     name.trim().length > 1 &&
-    (mode === "openapi"
-      ? specUrl.trim().length > 5
-      : notes.trim().length > 20 && (!engineLive || baseUrl.trim().length > 5));
+    // text mode needs only the notes — the commissioning interview elicits the
+    // base URL (and confirms the rest) rather than demanding it up front.
+    (mode === "openapi" ? specUrl.trim().length > 5 : notes.trim().length > 20);
 
   const couple = async () => {
     if (!result) return;
@@ -115,6 +124,38 @@ export default function AddSystemPanel({
     });
     onClose();
   };
+
+  // text mode + live engine → draft an interpretation and open the commissioning
+  // terminal (verify-before-commit). Everything else keeps the mock evaluation.
+  const startEvaluation = async () => {
+    if (mode === "text" && engineLive) {
+      setDrafting(true);
+      setCoupleError(null);
+      const d = await engineDraftSystem(name.trim(), { doc: notes.trim() }, baseUrl.trim());
+      setDrafting(false);
+      if (d) {
+        setDraft(d);
+        return;
+      }
+      setCoupleError("The engine could not infer operations from those docs — add clearer endpoint/method details.");
+      return;
+    }
+    setEvaluating(true);
+  };
+
+  if (draft) {
+    return (
+      <CommissioningTerminal
+        name={name.trim()}
+        draft={draft}
+        onCommitted={async () => {
+          await onCoupled?.();
+          onClose();
+        }}
+        onClose={() => setDraft(null)}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[120] grid place-items-center bg-carbon/90 p-6" role="dialog" aria-label="Couple a new system">
@@ -282,14 +323,14 @@ export default function AddSystemPanel({
                 />
                 <input
                   className="field font-mono"
-                  placeholder="API base URL for execution (e.g. https://api.vendor.com)"
+                  placeholder="API base URL (optional — the commissioning interview will ask if omitted)"
                   value={baseUrl}
                   onChange={(e) => setBaseUrl(e.target.value)}
                   aria-label="API base URL"
                 />
                 {engineLive && (
                   <p className="font-mono text-[0.62rem] uppercase tracking-wider text-acid">
-                    ● engine live — the model will read these notes and infer real tools
+                    ● engine live — the model reads your notes, then confirms its reading with you before committing
                   </p>
                 )}
               </div>
@@ -298,11 +339,17 @@ export default function AddSystemPanel({
 
           <button
             type="button"
-            disabled={!canEvaluate}
-            onClick={() => setEvaluating(true)}
+            disabled={!canEvaluate || drafting}
+            onClick={startEvaluation}
             className="btn-primary mt-4 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {mode === "text" ? "Evaluate the document" : "Read the spec"}
+            {drafting
+              ? "Reading your notes…"
+              : mode === "text"
+                ? engineLive
+                  ? "Commission this system"
+                  : "Evaluate the document"
+                : "Read the spec"}
           </button>
           </>
           )}

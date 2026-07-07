@@ -213,6 +213,99 @@ export async function engineCoupleSystem(
   }
 }
 
+// ── Commissioning: verify-before-commit onboarding ──────────────────────────
+export interface DraftGap {
+  id: string;
+  kind: string;
+  question: string;
+  tool?: string;
+}
+
+export interface DraftTool {
+  name: string;
+  method: string;
+  path: string;
+  description?: string;
+  parameters?: unknown;
+  permission: string;
+}
+
+export interface DraftCapabilities {
+  system_purpose?: string;
+  tools?: Record<string, string>;
+  joint_capabilities?: string[];
+  risks?: string[];
+  evaluated_by?: string;
+}
+
+export interface DraftInterpretation {
+  name: string;
+  title?: string;
+  base_url: string;
+  tools: DraftTool[];
+  capabilities: DraftCapabilities;
+  context?: BusinessContext;
+  gaps: DraftGap[];
+}
+
+/** Step 1 — infer an interpretation + its open questions. Nothing is persisted. */
+export async function engineDraftSystem(
+  name: string,
+  source: { specUrl?: string; doc?: string },
+  baseUrl?: string,
+  context?: BusinessContext
+): Promise<DraftInterpretation | null> {
+  try {
+    const res = await fetch(`${ENGINE_URL}/systems/draft`, {
+      method: "POST",
+      headers: authHeaders({ "content-type": "application/json" }),
+      body: JSON.stringify({ name, base_url: baseUrl, spec_url: source.specUrl, doc: source.doc, context }),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as DraftInterpretation;
+  } catch {
+    return null;
+  }
+}
+
+/** Step 2 — one confirmation turn: operator message → reply + refined draft. */
+export async function engineClarifyDraft(
+  interpretation: DraftInterpretation,
+  message: string,
+  history: { role: string; content: string }[]
+): Promise<{ reply: string; interpretation: DraftInterpretation; gaps: DraftGap[] } | null> {
+  try {
+    const res = await fetch(`${ENGINE_URL}/systems/clarify`, {
+      method: "POST",
+      headers: authHeaders({ "content-type": "application/json" }),
+      body: JSON.stringify({ interpretation, message, history }),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as { reply: string; interpretation: DraftInterpretation; gaps: DraftGap[] };
+  } catch {
+    return null;
+  }
+}
+
+/** Step 3 — the gate: persist the operator-confirmed interpretation. */
+export async function engineCommitSystem(
+  name: string,
+  interpretation: DraftInterpretation,
+  auth?: CoupleAuth
+): Promise<{ id: string; name: string; tool_count: number } | null> {
+  try {
+    const res = await fetch(`${ENGINE_URL}/systems/commit`, {
+      method: "POST",
+      headers: authHeaders({ "content-type": "application/json" }),
+      body: JSON.stringify({ name, interpretation, auth }),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as { id: string; name: string; tool_count: number };
+  } catch {
+    return null;
+  }
+}
+
 export interface EngineActivity {
   time: string;
   intent: string;

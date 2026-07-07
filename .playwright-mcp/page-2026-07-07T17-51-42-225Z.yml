@@ -1,0 +1,27 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - generic [ref=f1e4]: "000"
+    - generic [ref=f1e5]: "100"
+    - generic [ref=f1e11]: "000"
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f1e13]:
+    - banner [ref=f1e14]:
+      - link "Mimir" [ref=f1e15]:
+        - /url: /
+        - generic [ref=f1e18]: Mimir
+    - main [ref=f1e19]:
+      - generic [ref=f1e21]:
+        - paragraph [ref=f1e22]: Operator handshake
+        - img [ref=f1e24]
+        - list [ref=f1e34]:
+          - listitem [ref=f1e35]: · identity received · locating operator
+          - listitem [ref=f1e57]: · key accepted · rings aligned
+          - listitem [ref=f1e60]: · verifying credentials…
+          - listitem [ref=f1e61]: · handshake complete · deck unlocked
+  - button "Open Next.js Dev Tools" [ref=f1e52] [cursor=pointer]:
+    - img [ref=f1e53]
+  - alert [ref=f1e56]

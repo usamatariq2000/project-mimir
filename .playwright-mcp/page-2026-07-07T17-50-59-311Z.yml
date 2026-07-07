@@ -1,0 +1,43 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]: "000"
+    - generic [ref=e5]: "100"
+    - generic [ref=e11]: "000"
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=e13]:
+    - banner [ref=e14]:
+      - link "Mimir" [ref=e15]:
+        - /url: /
+        - generic [ref=e18]: Mimir
+    - main [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - paragraph [ref=e22]: Operator handshake
+          - img [ref=e24]
+          - list [ref=e34]:
+            - listitem [ref=e35]: · link opened · channel secure
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: Returning operator
+            - paragraph [ref=e39]: 01 / 02
+            - generic [ref=e40]: State your identity.
+            - generic [ref=e41]:
+              - textbox "State your identity." [active] [ref=e42]:
+                - /placeholder: you@company.com
+              - generic [ref=e43]:
+                - button "Continue" [ref=e44]
+                - paragraph [ref=e45]:
+                  - text: New here?
+                  - link "Get access" [ref=e46]:
+                    - /url: /signup
+          - generic:
+            - generic:
+              - paragraph: Access granted
+              - paragraph: routing to your deck…
+  - button "Open Next.js Dev Tools" [ref=e52] [cursor=pointer]:
+    - img [ref=e53]
+  - alert [ref=e56]

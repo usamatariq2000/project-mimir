@@ -179,6 +179,20 @@ execution layer powering that transformation.
 
 <!-- SCOPE-SYNC: keep this section in sync with the actual code. Updated by the Stop hook + /init command. -->
 
+- **2026-07-07 (commissioning — verify-before-commit onboarding):** vague docs (relative
+  paths, no host — the `{baseurl}/user/{id}` problem) no longer produce a silent, possibly-wrong
+  system. New flow: `POST /systems/draft` infers an interpretation and a **code-computed gap list**
+  (missing/placeholder base URL, unparsable ops, each destructive write, weak-confidence purpose) —
+  nothing persisted; `POST /systems/clarify` runs one interview turn (model proposes a reply +
+  structured patch via `complete_json`, code applies it deterministically, gaps recomputed);
+  `POST /systems/commit` is the gate — persists only the operator-confirmed interpretation, base URL
+  required. Front-end: the deck's text-doc path opens a **commissioning terminal** (Operations-Ledger
+  console, no glow) — full interpretation on the left for review, the AI's targeted questions on the
+  right, draft refines live, commit disabled until confirmed. Confirmation + confidence together are
+  the accuracy gate (Doctrine #7 verify-before-commit, #12 grow-from-confirmation). Verified:
+  `eval/commission_check` 9/9 + full in-browser E2E (vague notes → base URL elicited in chat →
+  committed system on the deck).
+
 - **2026-07-07 (Step 5 — undocumented-API ingestion, for real):** the "only a text document"
   path is no longer a mock. Engine `ingestion.infer_from_doc` feeds pasted human-written docs to
   the model under a validate-and-repair contract (`complete_json`) and extracts a callable

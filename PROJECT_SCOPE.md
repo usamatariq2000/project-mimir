@@ -179,6 +179,18 @@ execution layer powering that transformation.
 
 <!-- SCOPE-SYNC: keep this section in sync with the actual code. Updated by the Stop hook + /init command. -->
 
+- **2026-07-07 (commissioning — verify the whole reading + take suggestions):** the interview now
+  covers more than base URL + writes. The engine extracts **domain vocabulary** from the docs and asks
+  the operator to confirm/correct it (confirmed terms feed the grounding glossary); flags **reads that
+  look like they expose personal data** and offers to gate them (only writes gate by default); and the
+  operator can **edit capabilities, risks, and per-op gating** in their own words (clarify patch) or by
+  clicking a badge in the terminal. The review panel shows the extracted vocabulary and a **holistic
+  plain-English summary with an explicit "this reading is correct" sign-off** that (plus a base URL)
+  gates commit — so confirmation, not just model confidence, is the accuracy floor. Gap resolutions are
+  sticky. Verified: `eval/commission_check` 13/13 + full in-browser E2E (gate toggle, glossary, added
+  risk, sign-off, commit). Known 7B quirk: an ambiguous reply can override a UI gate toggle (documented
+  in engine AGENTS.md).
+
 - **2026-07-07 (commissioning — verify-before-commit onboarding):** vague docs (relative
   paths, no host — the `{baseurl}/user/{id}` problem) no longer produce a silent, possibly-wrong
   system. New flow: `POST /systems/draft` infers an interpretation and a **code-computed gap list**

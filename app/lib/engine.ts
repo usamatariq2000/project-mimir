@@ -235,6 +235,7 @@ export interface DraftCapabilities {
   tools?: Record<string, string>;
   joint_capabilities?: string[];
   risks?: string[];
+  glossary_suggestions?: Record<string, string>;
   evaluated_by?: string;
 }
 

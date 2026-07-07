@@ -31,8 +31,19 @@ export default function CommissioningTerminal({
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [committing, setCommitting] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
+
+  // deterministic local edit — click a tool's badge to gate/ungate it. The edited
+  // interpretation is what gets committed, so this sticks.
+  const toggleGate = (name: string) =>
+    setInterp((p) => ({
+      ...p,
+      tools: p.tools.map((t) =>
+        t.name === name ? { ...t, permission: t.permission === "approval" ? "auto" : "approval" } : t
+      ),
+    }));
 
   // Opening message is derived from the gaps — no server round-trip needed.
   useEffect(() => {
@@ -50,8 +61,14 @@ export default function CommissioningTerminal({
   }, [messages, busy]);
 
   const gaps = interp.gaps ?? [];
-  const canCommit = (interp.base_url ?? "").trim().length > 0 && interp.tools.length > 0;
   const caps = interp.capabilities ?? {};
+  const canCommit = (interp.base_url ?? "").trim().length > 0 && interp.tools.length > 0 && confirmed;
+  // suggested vocabulary + anything the operator confirmed, shown together
+  const glossary = { ...(caps.glossary_suggestions ?? {}), ...(interp.context?.glossary ?? {}) };
+  const gatedCount = interp.tools.filter((t) => t.permission === "approval").length;
+  const holistic = `${caps.system_purpose || "This system"} It exposes ${interp.tools.length} operation(s)${
+    gatedCount ? `, ${gatedCount} held for approval` : ""
+  }${interp.base_url ? ` at ${interp.base_url}` : ""}.`;
 
   const send = async () => {
     const text = input.trim();
@@ -121,13 +138,18 @@ export default function CommissioningTerminal({
                     <span className="truncate font-mono text-xs text-bone">
                       <span className="text-dust">{t.method}</span> {t.path}
                     </span>
-                    <span
-                      className={`shrink-0 font-mono text-[0.58rem] uppercase tracking-wider ${
-                        t.permission === "approval" ? "text-ember" : "text-acid"
+                    <button
+                      type="button"
+                      onClick={() => toggleGate(t.name)}
+                      title="click to gate / un-gate this operation"
+                      className={`shrink-0 border px-1.5 font-mono text-[0.58rem] uppercase tracking-wider transition-colors ${
+                        t.permission === "approval"
+                          ? "border-ember/50 text-ember hover:bg-ember/10"
+                          : "border-acid/40 text-acid hover:bg-acid/10"
                       }`}
                     >
-                      {t.permission === "approval" ? "gated" : "read"}
-                    </span>
+                      {t.permission === "approval" ? "gated ⇄" : "read ⇄"}
+                    </button>
                   </div>
                   <p className="mt-0.5 font-mono text-[0.62rem] text-ash">
                     {caps.tools?.[t.name] || t.description || t.name}
@@ -152,6 +174,25 @@ export default function CommissioningTerminal({
                 </ul>
               </div>
             )}
+
+            {Object.keys(glossary).length > 0 && (
+              <div className="mt-4">
+                <p className="mb-1 font-mono text-[0.62rem] uppercase tracking-wider text-ash">
+                  Vocabulary <span className="text-dust">— tell me in chat if it's wrong or incomplete</span>
+                </p>
+                <ul className="space-y-0.5">
+                  {Object.entries(glossary).map(([term, meaning]) => (
+                    <li key={term} className="font-mono text-[0.68rem] text-dust">
+                      <span className="text-bone">{term}</span> — {meaning}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <p className="mt-4 border-t border-rule-soft pt-3 font-mono text-[0.6rem] text-dust">
+              Everything here is editable — click a badge to gate an operation, or just tell the engine in chat what to fix.
+            </p>
           </div>
 
           {/* RIGHT — the interview */}
@@ -200,19 +241,28 @@ export default function CommissioningTerminal({
               </button>
             </div>
 
-            <div className="rule-t flex items-center justify-between p-3">
-              <p className="font-mono text-[0.6rem] text-dust">
-                {canCommit
-                  ? gaps.length
-                    ? `${gaps.length} unconfirmed — commit when you're satisfied`
-                    : "all confirmed"
-                  : "a base URL is required before commit"}
-              </p>
+            <div className="rule-t p-3">
+              <p className="mb-2 text-xs text-bone">{holistic}</p>
+              <label className="mb-2 flex cursor-pointer items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={confirmed}
+                  onChange={(e) => setConfirmed(e.target.checked)}
+                  disabled={(interp.base_url ?? "").trim().length === 0}
+                  className="mt-0.5 accent-acid"
+                  aria-label="Confirm this reading is correct"
+                />
+                <span className="font-mono text-[0.66rem] text-ash">
+                  I&apos;ve reviewed this reading and it&apos;s correct.
+                  {(interp.base_url ?? "").trim().length === 0 && " (set a base URL first)"}
+                  {gaps.length > 0 && ` ${gaps.length} question(s) still open.`}
+                </span>
+              </label>
               <button
                 type="button"
                 onClick={commit}
                 disabled={!canCommit || committing}
-                className="btn-primary disabled:cursor-not-allowed disabled:opacity-40"
+                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {committing ? "committing…" : "Confirm & commit"}
               </button>

@@ -1,0 +1,106 @@
+- generic [ref=f3e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f3e3]:
+    - banner [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - link "MIMIR DECK" [ref=f3e6]:
+          - /url: /
+          - generic [ref=f3e8]: MIMIR DECK
+        - generic [ref=f3e9]:
+          - button "Deck" [pressed] [ref=f3e10]
+          - button "Monitor" [ref=f3e11]
+      - generic [ref=f3e12]:
+        - button "?" [ref=f3e13]
+        - generic [ref=f3e14]: 1 systems · engine live
+        - generic [ref=f3e16]: Eval Bot
+        - button "⏻ Log out" [ref=f3e17]:
+          - text: ⏻
+          - generic [ref=f3e18]: Log out
+    - dialog "Commission a new system" [ref=f3e92]:
+      - generic [ref=f3e93]:
+        - generic [ref=f3e94]:
+          - paragraph [ref=f3e95]: Commissioning · INTERNAL_SERVICE
+          - button "✕ abort" [ref=f3e97]
+        - generic [ref=f3e98]:
+          - generic [ref=f3e99]:
+            - paragraph [ref=f3e100]: System purpose
+            - paragraph [ref=f3e101]: Provides access to financial and customer support data for internal operations.
+            - generic [ref=f3e102]:
+              - paragraph [ref=f3e103]: Interpreted 4 operation(s)
+              - paragraph [ref=f3e104]: "base: — none yet"
+            - list [ref=f3e105]:
+              - listitem [ref=f3e106]:
+                - generic [ref=f3e107]:
+                  - generic [ref=f3e108]: GET /payments
+                  - button "read ⇄" [ref=f3e109]
+                - paragraph [ref=f3e110]: Lists payments and their status, useful for monitoring payment statuses.
+              - listitem [ref=f3e111]:
+                - generic [ref=f3e112]:
+                  - generic [ref=f3e113]: "POST /payments/{payment_id}/refund"
+                  - button "gated ⇄" [ref=f3e114]
+                - paragraph [ref=f3e115]: Refunds a specific payment by providing the payment ID, used when a refund is needed.
+              - listitem [ref=f3e116]:
+                - generic [ref=f3e117]:
+                  - generic [ref=f3e118]: GET /tickets
+                  - button "read ⇄" [ref=f3e119]
+                - paragraph [ref=f3e120]: Lists open support tickets, essential for managing customer inquiries.
+              - listitem [ref=f3e121]:
+                - generic [ref=f3e122]:
+                  - generic [ref=f3e123]: "GET /customers/{id}"
+                  - button "gated ⇄" [active] [ref=f3e156]
+                - paragraph [ref=f3e125]: Returns detailed information about a specific customer, helpful for customer service.
+            - generic [ref=f3e126]:
+              - paragraph [ref=f3e127]: Joint capabilities
+              - list [ref=f3e128]:
+                - listitem [ref=f3e129]: Combines get_payments and create_payments_payment_id_refund to manage payment statuses and refunds efficiently.
+            - generic [ref=f3e130]:
+              - paragraph [ref=f3e131]: Risks held for approval
+              - list [ref=f3e132]:
+                - listitem [ref=f3e133]: Ensure proper authorization is in place before accessing sensitive customer data.
+            - generic [ref=f3e134]:
+              - paragraph [ref=f3e135]: Vocabulary — tell me in chat if it's wrong or incomplete
+              - list [ref=f3e136]:
+                - listitem [ref=f3e137]: payment status — a field indicating whether a payment has been successfully processed or bounced
+                - listitem [ref=f3e138]: refund — an action to return money to a customer for a failed or incorrect payment
+            - paragraph [ref=f3e139]: Everything here is editable — click a badge to gate an operation, or just tell the engine in chat what to fix.
+          - generic [ref=f3e140]:
+            - generic [ref=f3e142]:
+              - paragraph [ref=f3e143]: engine
+              - paragraph [ref=f3e144]: "I read your notes and interpreted 4 operation(s). Before I commit this system I need to confirm 4 thing(s): 1. I don't have a real host to execute against — the docs only give relative paths. What is the base URL (e.g. https://api.vendor.com)? I won't guess one. 2. I read 'create_payments_payment_id_refund' (POST /payments/{payment_id}/refund) as a change to your data, so I'll hold it for approval every time. Is that correct — and what exactly does it do? 3. These reads may return personal or sensitive data: get_payments, get_customers_id. They're auto-run right now. Do any of them need to be held for approval too? 4. I picked up this vocabulary from your docs — is it right, and am I missing any terms your team uses? 'payment status' = a field indicating whether a payment has been successfully processed or bounced; 'refund' = an action to return money to a customer for a failed or incorrect payment"
+            - paragraph [ref=f3e146]: 4 open question(s) — base_url, write:create_payments_payment_id_refund, sensitive_reads, glossary
+            - generic [ref=f3e147]:
+              - textbox "Reply to the engine" [ref=f3e148]:
+                - /placeholder: Answer the engine — e.g. 'base URL is https://api.acme.com'
+              - button "send" [disabled] [ref=f3e149]
+            - generic [ref=f3e150]:
+              - paragraph [ref=f3e151]: Provides access to financial and customer support data for internal operations. It exposes 4 operation(s), 2 held for approval.
+              - generic [ref=f3e152]:
+                - checkbox "Confirm this reading is correct" [disabled] [ref=f3e153]
+                - generic [ref=f3e154]: I've reviewed this reading and it's correct. (set a base URL first) 4 question(s) still open.
+              - button "Confirm & commit" [disabled] [ref=f3e155]
+    - main [ref=f3e19]:
+      - paragraph [ref=f3e20]: Operating all systems
+      - heading "State your intent." [level=1] [ref=f3e21]
+      - generic [ref=f3e23]:
+        - generic [ref=f3e24]: ❯
+        - textbox "Intent" [ref=f3e25]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=f3e26]
+      - list [ref=f3e27]:
+        - listitem [ref=f3e28]:
+          - button "Refund every failed payment from yesterday" [ref=f3e29]
+        - listitem [ref=f3e30]:
+          - button "Which products will run out of stock this week?" [ref=f3e31]
+        - listitem [ref=f3e32]:
+          - button "Close all resolved tickets older than 7 days" [ref=f3e33]
+    - contentinfo [ref=f3e34]:
+      - generic [ref=f3e35]: Systems
+      - button "Acme Commerce" [ref=f3e53]: Acme Commerce
+      - button "+ couple a system" [ref=f3e42]
+  - button "Open Next.js Dev Tools" [ref=f3e48] [cursor=pointer]:
+    - img [ref=f3e49]
+  - alert [ref=f3e52]

@@ -1,0 +1,82 @@
+- generic [ref=f3e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f3e3]:
+    - banner [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - link "MIMIR DECK" [ref=f3e6]:
+          - /url: /
+          - generic [ref=f3e8]: MIMIR DECK
+        - generic [ref=f3e9]:
+          - button "Deck" [pressed] [ref=f3e10]
+          - button "Monitor" [ref=f3e11]
+      - generic [ref=f3e12]:
+        - button "?" [ref=f3e13]
+        - generic [ref=f3e14]: 1 systems · engine live
+        - generic [ref=f3e16]: Eval Bot
+        - button "⏻ Log out" [ref=f3e17]:
+          - text: ⏻
+          - generic [ref=f3e18]: Log out
+    - dialog "Couple a new system" [ref=f3e55]:
+      - generic [ref=f3e56]:
+        - generic [ref=f3e57]:
+          - paragraph [ref=f3e58]: Couple a new system
+          - button "✕ close" [ref=f3e59]
+        - generic [ref=f3e60]:
+          - generic [ref=f3e61]: System name
+          - textbox "System name" [active] [ref=f3e62]:
+            - /placeholder: e.g. Shipmate (our logistics vendor)
+          - paragraph [ref=f3e63]: How is its API documented?
+          - generic [ref=f3e64]:
+            - button "OpenAPI / Swagger A proper spec exists. Fast, exact." [pressed] [ref=f3e65]:
+              - paragraph [ref=f3e66]: OpenAPI / Swagger
+              - paragraph [ref=f3e67]: A proper spec exists. Fast, exact.
+            - button "Only a text document Notes, a wiki page, an email. Mimir reads it and infers the tools." [ref=f3e68]:
+              - paragraph [ref=f3e69]: Only a text document
+              - paragraph [ref=f3e70]: Notes, a wiki page, an email. Mimir reads it and infers the tools.
+          - generic [ref=f3e72]:
+            - textbox "OpenAPI spec URL" [ref=f3e73]:
+              - /placeholder: https://api.vendor.com/openapi.json
+            - textbox "API base URL" [ref=f3e74]:
+              - /placeholder: API base URL for execution (defaults to the spec's origin)
+            - paragraph [ref=f3e75]: ● engine live — this will couple for real
+            - generic [ref=f3e76]:
+              - paragraph [ref=f3e77]: Authentication
+              - generic [ref=f3e78]:
+                - button "none" [ref=f3e79]
+                - button "bearer" [ref=f3e80]
+                - button "API key" [ref=f3e81]
+                - button "basic" [ref=f3e82]
+            - generic [ref=f3e83]:
+              - paragraph [ref=f3e84]: Business context — grounds the AI in your domain
+              - textbox "Business description" [ref=f3e85]:
+                - /placeholder: What is this business? e.g. 'An HR system managing employees, leave, and payroll for a 200-person company.'
+              - textbox "Glossary" [ref=f3e86]:
+                - /placeholder: "Glossary — one per line, 'term = meaning':\nrun = a delivery route\ngiveback = a refund"
+              - paragraph [ref=f3e87]: Injected into evaluation + the agent so it understands your terms (e.g. what get_user_details returns).
+          - button "Read the spec" [disabled] [ref=f3e88]
+    - main [ref=f3e19]:
+      - paragraph [ref=f3e20]: Operating all systems
+      - heading "State your intent." [level=1] [ref=f3e21]
+      - generic [ref=f3e23]:
+        - generic [ref=f3e24]: ❯
+        - textbox "Intent" [ref=f3e25]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=f3e26]
+      - list [ref=f3e27]:
+        - listitem [ref=f3e28]:
+          - button "Refund every failed payment from yesterday" [ref=f3e29]
+        - listitem [ref=f3e30]:
+          - button "Which products will run out of stock this week?" [ref=f3e31]
+        - listitem [ref=f3e32]:
+          - button "Close all resolved tickets older than 7 days" [ref=f3e33]
+    - contentinfo [ref=f3e34]:
+      - generic [ref=f3e35]: Systems
+      - button "Acme Commerce" [ref=f3e53]: Acme Commerce
+      - button "+ couple a system" [ref=f3e42]
+  - button "Open Next.js Dev Tools" [ref=f3e48] [cursor=pointer]:
+    - img [ref=f3e49]
+  - alert [ref=f3e52]

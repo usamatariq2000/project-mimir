@@ -1,0 +1,45 @@
+- generic [active] [ref=f3e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f3e3]:
+    - banner [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - link "MIMIR DECK" [ref=f3e6]:
+          - /url: /
+          - generic [ref=f3e8]: MIMIR DECK
+        - generic [ref=f3e9]:
+          - button "Deck" [pressed] [ref=f3e10]
+          - button "Monitor" [ref=f3e11]
+      - generic [ref=f3e12]:
+        - button "?" [ref=f3e13]
+        - generic [ref=f3e14]: 2 systems · engine live
+        - generic [ref=f3e16]: Eval Bot
+        - button "⏻ Log out" [ref=f3e17]:
+          - text: ⏻
+          - generic [ref=f3e18]: Log out
+    - main [ref=f3e19]:
+      - paragraph [ref=f3e20]: Operating all systems
+      - heading "State your intent." [level=1] [ref=f3e21]
+      - generic [ref=f3e23]:
+        - generic [ref=f3e24]: ❯
+        - textbox "Intent" [ref=f3e25]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=f3e26]
+      - list [ref=f3e27]:
+        - listitem [ref=f3e28]:
+          - button "Refund every failed payment from yesterday" [ref=f3e29]
+        - listitem [ref=f3e30]:
+          - button "Which products will run out of stock this week?" [ref=f3e31]
+        - listitem [ref=f3e32]:
+          - button "Close all resolved tickets older than 7 days" [ref=f3e33]
+    - contentinfo [ref=f3e34]:
+      - generic [ref=f3e35]: Systems
+      - button "Acme Commerce" [ref=f3e53]: Acme Commerce
+      - button "Sensitive Vendor" [ref=f3e165]: Sensitive Vendor
+      - button "+ couple a system" [ref=f3e42]
+  - button "Open Next.js Dev Tools" [ref=f3e48] [cursor=pointer]:
+    - img [ref=f3e49]
+  - alert [ref=f3e52]

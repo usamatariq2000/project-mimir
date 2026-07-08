@@ -143,11 +143,61 @@ export default function AddSystemPanel({
     setEvaluating(true);
   };
 
+  const buildAuthCfg = (): CoupleAuth =>
+    authType === "bearer"
+      ? { type: "bearer", token: authToken }
+      : authType === "api_key"
+        ? { type: "api_key", header: authHeader, value: authValue }
+        : authType === "basic"
+          ? { type: "basic", username: authUser, password: authPass }
+          : { type: "none" };
+
+  // shared auth UI — used by both the OpenAPI and text-doc paths so a doc-ingested
+  // system can authenticate too (credentials are vaulted; the AI never sees them).
+  const authFields = (
+    <div className="border-t border-rule-soft pt-3">
+      <p className="mb-1.5 font-mono text-[0.65rem] uppercase tracking-wider text-ash">Authentication</p>
+      <div className="flex flex-wrap gap-1.5">
+        {(["none", "bearer", "api_key", "basic"] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setAuthType(t)}
+            className={`border px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-wider transition-colors ${authType === t ? "border-acid bg-acid/10 text-acid" : "border-rule text-ash hover:border-dust"}`}
+          >
+            {t === "api_key" ? "API key" : t}
+          </button>
+        ))}
+      </div>
+      {authType === "bearer" && (
+        <input className="field mt-2 font-mono" type="password" placeholder="Bearer token (e.g. sk_test_…)" value={authToken} onChange={(e) => setAuthToken(e.target.value)} aria-label="Bearer token" />
+      )}
+      {authType === "api_key" && (
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <input className="field font-mono" placeholder="Header name" value={authHeader} onChange={(e) => setAuthHeader(e.target.value)} aria-label="API key header" />
+          <input className="field font-mono" type="password" placeholder="Key value" value={authValue} onChange={(e) => setAuthValue(e.target.value)} aria-label="API key value" />
+        </div>
+      )}
+      {authType === "basic" && (
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <input className="field font-mono" placeholder="Username" value={authUser} onChange={(e) => setAuthUser(e.target.value)} aria-label="Basic auth username" />
+          <input className="field font-mono" type="password" placeholder="Password" value={authPass} onChange={(e) => setAuthPass(e.target.value)} aria-label="Basic auth password" />
+        </div>
+      )}
+      {authType !== "none" && (
+        <p className="mt-1.5 font-mono text-[0.6rem] text-dust">
+          Sealed in the vault (encrypted). The AI never sees it — only the executor injects it.
+        </p>
+      )}
+    </div>
+  );
+
   if (draft) {
     return (
       <CommissioningTerminal
         name={name.trim()}
         draft={draft}
+        auth={buildAuthCfg()}
         onCommitted={async () => {
           await onCoupled?.();
           onClose();
@@ -252,43 +302,7 @@ export default function AddSystemPanel({
                     ● engine live — this will couple for real
                   </p>
                 )}
-                <div className="border-t border-rule-soft pt-3">
-                  <p className="mb-1.5 font-mono text-[0.65rem] uppercase tracking-wider text-ash">
-                    Authentication
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {(["none", "bearer", "api_key", "basic"] as const).map((t) => (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => setAuthType(t)}
-                        className={`border px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-wider transition-colors ${authType === t ? "border-acid bg-acid/10 text-acid" : "border-rule text-ash hover:border-dust"}`}
-                      >
-                        {t === "api_key" ? "API key" : t}
-                      </button>
-                    ))}
-                  </div>
-                  {authType === "bearer" && (
-                    <input className="field mt-2 font-mono" type="password" placeholder="Bearer token (e.g. sk_test_…)" value={authToken} onChange={(e) => setAuthToken(e.target.value)} aria-label="Bearer token" />
-                  )}
-                  {authType === "api_key" && (
-                    <div className="mt-2 grid grid-cols-2 gap-2">
-                      <input className="field font-mono" placeholder="Header name" value={authHeader} onChange={(e) => setAuthHeader(e.target.value)} aria-label="API key header" />
-                      <input className="field font-mono" type="password" placeholder="Key value" value={authValue} onChange={(e) => setAuthValue(e.target.value)} aria-label="API key value" />
-                    </div>
-                  )}
-                  {authType === "basic" && (
-                    <div className="mt-2 grid grid-cols-2 gap-2">
-                      <input className="field font-mono" placeholder="Username" value={authUser} onChange={(e) => setAuthUser(e.target.value)} aria-label="Basic auth username" />
-                      <input className="field font-mono" type="password" placeholder="Password" value={authPass} onChange={(e) => setAuthPass(e.target.value)} aria-label="Basic auth password" />
-                    </div>
-                  )}
-                  {authType !== "none" && (
-                    <p className="mt-1.5 font-mono text-[0.6rem] text-dust">
-                      Sealed in the vault (encrypted). The AI never sees it — only the executor injects it.
-                    </p>
-                  )}
-                </div>
+                {authFields}
                 <div className="border-t border-rule-soft pt-3">
                   <p className="mb-1.5 font-mono text-[0.65rem] uppercase tracking-wider text-ash">
                     Business context <span className="text-dust">— grounds the AI in your domain</span>
@@ -333,6 +347,7 @@ export default function AddSystemPanel({
                     ● engine live — the model reads your notes, then confirms its reading with you before committing
                   </p>
                 )}
+                {authFields}
               </div>
             )}
           </div>

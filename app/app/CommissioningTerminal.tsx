@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   engineClarifyDraft,
   engineCommitSystem,
+  type CoupleAuth,
   type DraftInterpretation,
 } from "../lib/engine";
 
@@ -18,11 +19,13 @@ type Msg = { role: "ai" | "operator"; content: string };
 export default function CommissioningTerminal({
   name,
   draft,
+  auth,
   onCommitted,
   onClose,
 }: {
   name: string;
   draft: DraftInterpretation;
+  auth?: CoupleAuth;
   onCommitted: () => Promise<void> | void;
   onClose: () => void;
 }) {
@@ -92,7 +95,7 @@ export default function CommissioningTerminal({
     if (!canCommit || committing) return;
     setCommitting(true);
     setError(null);
-    const res = await engineCommitSystem(name, interp);
+    const res = await engineCommitSystem(name, interp, auth);
     setCommitting(false);
     if (!res) {
       setError("Commit failed — check the base URL is reachable and try again.");

@@ -162,10 +162,13 @@ The engine runs WITHOUT `--reload`; **restart it after editing `app/` Python** t
 - **Make the UI gate toggle authoritative** — a per-op badge toggle set in the terminal can currently
   be overridden by a later ambiguous clarify reply (the model owns the patch). Small fix: treat a
   UI-set permission as locked unless the operator explicitly changes it in chat.
-- **Auth capture for doc-based systems** — the commissioning/text-doc path couples as `auth: none`;
-  the vault auth fields are only wired into the OpenAPI mode of `AddSystemPanel`.
+- ~~Auth capture for doc-based systems~~ **DONE 2026-07-08** — the auth UI (bearer/api_key/basic) now
+  renders in the text-doc path and flows through the commissioning commit; verified auth_type persists
+  and the token never leaks. Doc-only APIs that need a token can now be tested live.
 - **`{baseurl}` mid-path normalization** — a literal `{baseurl}`/`{host}` token in pasted docs makes
   the model emit a path not starting with `/`, which gets dropped. Add a strip/normalize step.
+- **OAuth2 vault scheme** — only bearer/api_key/basic today; OAuth2 client-credentials needs a new
+  `vault.py` scheme before OAuth2-protected APIs can be operated.
 - **Queued (from doctrine borrows, gated behind a harness case)**: role-scoped **authorization** (agent
   inherits operator permissions); explicit **memory taxonomy** (static/dynamic/operational/organizational).
 - **Deferred backlog**: RAG hardening (hybrid search, reranking, HyDE, pgvector), OAuth2

@@ -27,9 +27,11 @@ Runtime, Execution Engine, Knowledge Layer, Audit System), and phase plan: see `
   (argon2-hashed passwords), every operational endpoint requires a token, the operator is
   stamped on runs+audit; the deck's login/signup call the engine, store the token, gate the
   deck. Read `../mimir-engine/AGENTS.md` before touching backend code — run book, invariants,
-  machine gotchas — including its **RULE 0 "AI Systems Engineering Doctrine"** (12 principles;
-  small-model-first, code-enforces-not-prompts, eval-driven, structured-over-parsed, …) that
-  all engine/agent work is held to. This is a deliberately-engineered AI system, not a wrapper.
+  machine gotchas — including its **RULE 0 "AI Systems Engineering Doctrine"** (13 principles;
+  small-model-first, code-enforces-not-prompts, eval-driven, structured-over-parsed,
+  AI-understands-code-validates [never hard-code external-API conventions — the model reads/normalizes
+  any doc style, code only validates against saved types], …) that all engine/agent work is held to.
+  This is a deliberately-engineered AI system, not a wrapper.
 - Any code change that alters this scope must update `PROJECT_SCOPE.md` and this summary in the same turn.
 
 # Rule 0 — Libraries first, always

@@ -1,0 +1,73 @@
+- generic [active] [ref=f3e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f3e3]:
+    - banner [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - link "MIMIR DECK" [ref=f3e6]:
+          - /url: /
+          - generic [ref=f3e8]: MIMIR DECK
+        - generic [ref=f3e9]:
+          - button "Deck" [pressed] [ref=f3e10]
+          - button "Monitor" [ref=f3e11]
+      - generic [ref=f3e12]:
+        - button "?" [ref=f3e13]
+        - generic [ref=f3e14]: 1 systems · engine live
+        - generic [ref=f3e16]: Eval Bot
+        - button "⏻ Log out" [ref=f3e17]:
+          - text: ⏻
+          - generic [ref=f3e18]: Log out
+    - dialog "Couple a new system" [ref=f3e56]:
+      - generic [ref=f3e57]:
+        - generic [ref=f3e58]:
+          - paragraph [ref=f3e59]: Couple a new system
+          - button "✕ close" [ref=f3e60]
+        - generic [ref=f3e61]:
+          - generic [ref=f3e62]: System name
+          - textbox "System name" [ref=f3e63]:
+            - /placeholder: e.g. Shipmate (our logistics vendor)
+            - text: Login API Test
+          - paragraph [ref=f3e64]: How is its API documented?
+          - generic [ref=f3e65]:
+            - button "OpenAPI / Swagger A proper spec exists. Fast, exact." [ref=f3e66]:
+              - paragraph [ref=f3e67]: OpenAPI / Swagger
+              - paragraph [ref=f3e68]: A proper spec exists. Fast, exact.
+            - button "Only a text document Notes, a wiki page, an email. Mimir reads it and infers the tools." [pressed] [ref=f3e69]:
+              - paragraph [ref=f3e70]: Only a text document
+              - paragraph [ref=f3e71]: Notes, a wiki page, an email. Mimir reads it and infers the tools.
+          - generic [ref=f3e73]:
+            - textbox "API notes text" [ref=f3e95]:
+              - /placeholder: "Paste whatever exists — e.g.\n“to book a shipment POST the order payload to /shipments, tracking is at /track with the ref, rates can be queried per zone…”"
+              - text: Internal service. To authenticate, POST your username and password to /auth/login and you receive an access_token. GET /secure/status returns the account tier and requires a bearer token. GET /tickets lists open support tickets.
+            - textbox "API base URL" [ref=f3e75]:
+              - /placeholder: API base URL (optional — the commissioning interview will ask if omitted)
+              - text: http://127.0.0.1:8001
+            - paragraph [ref=f3e76]: ● engine live — the model reads your notes, then confirms its reading (and how it authenticates) with you before committing
+          - button "Reading your notes…" [disabled] [ref=f3e97]
+    - main [ref=f3e19]:
+      - paragraph [ref=f3e20]: Operating all systems
+      - heading "State your intent." [level=1] [ref=f3e21]
+      - generic [ref=f3e23]:
+        - generic [ref=f3e24]: ❯
+        - textbox "Intent" [ref=f3e25]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=f3e26]
+      - list [ref=f3e27]:
+        - listitem [ref=f3e28]:
+          - button "Refund every failed payment from yesterday" [ref=f3e29]
+        - listitem [ref=f3e30]:
+          - button "Which products will run out of stock this week?" [ref=f3e31]
+        - listitem [ref=f3e32]:
+          - button "Close all resolved tickets older than 7 days" [ref=f3e33]
+    - contentinfo [ref=f3e34]:
+      - generic [ref=f3e35]: Systems
+      - generic [ref=f3e91]:
+        - button "Acme Commerce" [ref=f3e92]: Acme Commerce
+        - button "Reconnect Acme Commerce" [ref=f3e94]: ⟳
+      - button "+ couple a system" [ref=f3e45]
+  - button "Open Next.js Dev Tools" [ref=f3e51] [cursor=pointer]:
+    - img [ref=f3e52]
+  - alert [ref=f3e55]

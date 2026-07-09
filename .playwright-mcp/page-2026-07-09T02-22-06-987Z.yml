@@ -1,0 +1,125 @@
+- generic [ref=f3e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f3e3]:
+    - banner [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - link "MIMIR DECK" [ref=f3e6]:
+          - /url: /
+          - generic [ref=f3e8]: MIMIR DECK
+        - generic [ref=f3e9]:
+          - button "Deck" [pressed] [ref=f3e10]
+          - button "Monitor" [ref=f3e11]
+      - generic [ref=f3e12]:
+        - button "?" [ref=f3e13]
+        - generic [ref=f3e14]: 1 systems · engine live
+        - generic [ref=f3e16]: Eval Bot
+        - button "⏻ Log out" [ref=f3e17]:
+          - text: ⏻
+          - generic [ref=f3e18]: Log out
+    - dialog "Commission a new system" [ref=f3e98]:
+      - generic [ref=f3e99]:
+        - generic [ref=f3e100]:
+          - paragraph [ref=f3e101]: Commissioning · INTERNAL SERVICE API
+          - button "✕ abort" [ref=f3e103]
+        - generic [ref=f3e104]:
+          - generic [ref=f3e105]:
+            - paragraph [ref=f3e106]: System purpose
+            - paragraph [ref=f3e107]: Provide secure access and manage user authentication and account information.
+            - generic [ref=f3e108]:
+              - paragraph [ref=f3e109]: Interpreted 3 operation(s)
+              - paragraph [ref=f3e110]: "base: http://127.0.0.1:8001"
+            - list [ref=f3e111]:
+              - listitem [ref=f3e112]:
+                - generic [ref=f3e113]:
+                  - generic [ref=f3e114]: POST /auth/login
+                  - button "gated ⇄" [ref=f3e115]
+                - paragraph [ref=f3e116]: Authenticate users by posting their username and password for initial or re-authentication purposes.
+              - listitem [ref=f3e117]:
+                - generic [ref=f3e118]:
+                  - generic [ref=f3e119]: GET /secure/status
+                  - button "read ⇄" [ref=f3e120]
+                - paragraph [ref=f3e121]: Retrieve the account tier of a logged-in user using a bearer token, useful for permission checks.
+              - listitem [ref=f3e122]:
+                - generic [ref=f3e123]:
+                  - generic [ref=f3e124]: GET /tickets
+                  - button "read ⇄" [ref=f3e125]
+                - paragraph [ref=f3e126]: List open support tickets for a user, helpful for tracking ongoing issues.
+            - generic [ref=f3e127]:
+              - paragraph [ref=f3e128]: Joint capabilities
+              - list [ref=f3e129]:
+                - listitem [ref=f3e130]: Use create_auth_login and get_secure_status together to authenticate and validate a user's account level in one session.
+            - generic [ref=f3e131]:
+              - paragraph [ref=f3e132]: Risks held for approval
+              - list [ref=f3e133]:
+                - listitem [ref=f3e134]: Exposing sensitive information through unauthorized access attempts could lead to security breaches.
+            - generic [ref=f3e135]:
+              - paragraph [ref=f3e136]: Vocabulary — tell me in chat if it's wrong or incomplete
+              - list [ref=f3e137]:
+                - listitem [ref=f3e138]: account tier — The level of service or permissions associated with the user’s account.
+                - listitem [ref=f3e139]: bearer token — A token used in HTTP requests to authenticate and authorize API calls.
+            - paragraph [ref=f3e140]: Everything here is editable — click a badge to gate an operation, or just tell the engine in chat what to fix.
+          - generic [ref=f3e141]:
+            - generic [ref=f3e143]:
+              - paragraph [ref=f3e144]: engine
+              - paragraph [ref=f3e145]: "I read your notes and interpreted 3 operation(s). Before I commit this system I need to confirm 2 thing(s): 1. I read 'create_auth_login' (POST /auth/login) as a change to your data, so I'll hold it for approval every time. Is that correct — and what exactly does it do? 2. I picked up this vocabulary from your docs — is it right, and am I missing any terms your team uses? 'account tier' = The level of service or permissions associated with the user’s account.; 'bearer token' = A token used in HTTP requests to authenticate and authorize API calls. Also — how does this API authenticate? Pick a method under “Authentication” below. If it issues tokens from a login, choose “login (auto-token)” and give me a service account; I’ll test it before we save."
+            - paragraph [ref=f3e147]: 2 open question(s) — write:create_auth_login, glossary
+            - generic [ref=f3e148]:
+              - textbox "Reply to the engine" [ref=f3e149]:
+                - /placeholder: Answer the engine — e.g. 'base URL is https://api.acme.com'
+              - button "send" [disabled] [ref=f3e150]
+            - generic [ref=f3e151]:
+              - paragraph [ref=f3e152]: Authentication — how Mimir authenticates to this API
+              - generic [ref=f3e153]:
+                - button "none" [ref=f3e154]
+                - button "bearer" [ref=f3e155]
+                - button "API key" [ref=f3e156]
+                - button "basic" [ref=f3e157]
+                - button "login (auto-token)" [ref=f3e158]
+              - generic [ref=f3e165]:
+                - paragraph [ref=f3e166]: Give a dedicated service account for this API. Mimir tests the login, then mints & refreshes tokens itself.
+                - generic [ref=f3e167]:
+                  - textbox "Service account username" [ref=f3e168]:
+                    - /placeholder: Service-account username
+                    - text: ai-operator
+                  - textbox "Service account password" [ref=f3e169]:
+                    - /placeholder: Password
+                    - text: op-secret
+                - textbox "Login path" [ref=f3e170]:
+                  - /placeholder: Login path (optional — e.g. /auth/login)
+                - button "Test & discover" [ref=f3e174]
+                - paragraph [ref=f3e175]: ✓ Login proven — token field "access_token". Sample token tok-…5e
+              - paragraph [ref=f3e172]: Sealed in the vault (encrypted). The AI never sees it.
+            - generic [ref=f3e159]:
+              - paragraph [ref=f3e160]: Provide secure access and manage user authentication and account information. It exposes 3 operation(s), 1 held for approval at http://127.0.0.1:8001.
+              - generic [ref=f3e161]:
+                - checkbox "Confirm this reading is correct" [checked] [active] [ref=f3e162]
+                - generic [ref=f3e163]: I've reviewed this reading and it's correct. 2 question(s) still open.
+              - button "Confirm & commit" [ref=f3e164]
+    - main [ref=f3e19]:
+      - paragraph [ref=f3e20]: Operating all systems
+      - heading "State your intent." [level=1] [ref=f3e21]
+      - generic [ref=f3e23]:
+        - generic [ref=f3e24]: ❯
+        - textbox "Intent" [ref=f3e25]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=f3e26]
+      - list [ref=f3e27]:
+        - listitem [ref=f3e28]:
+          - button "Refund every failed payment from yesterday" [ref=f3e29]
+        - listitem [ref=f3e30]:
+          - button "Which products will run out of stock this week?" [ref=f3e31]
+        - listitem [ref=f3e32]:
+          - button "Close all resolved tickets older than 7 days" [ref=f3e33]
+    - contentinfo [ref=f3e34]:
+      - generic [ref=f3e35]: Systems
+      - generic [ref=f3e91]:
+        - button "Acme Commerce" [ref=f3e92]: Acme Commerce
+        - button "Reconnect Acme Commerce" [ref=f3e94]: ⟳
+      - button "+ couple a system" [ref=f3e45]
+  - button "Open Next.js Dev Tools" [ref=f3e51] [cursor=pointer]:
+    - img [ref=f3e52]
+  - alert [ref=f3e55]

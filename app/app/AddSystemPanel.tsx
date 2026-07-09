@@ -97,14 +97,7 @@ export default function AddSystemPanel({
     if (mode === "openapi" && engineLive) {
       setCoupling(true);
       setCoupleError(null);
-      const authCfg: CoupleAuth =
-        authType === "bearer"
-          ? { type: "bearer", token: authToken }
-          : authType === "api_key"
-            ? { type: "api_key", header: authHeader, value: authValue }
-            : authType === "basic"
-              ? { type: "basic", username: authUser, password: authPass }
-              : { type: "none" };
+      const authCfg = buildAuthCfg();
       // parse the glossary textarea: one "term = meaning" per line
       const gloss: Record<string, string> = {};
       glossary.split("\n").forEach((line) => {
@@ -261,7 +254,6 @@ export default function AddSystemPanel({
       <CommissioningTerminal
         name={name.trim()}
         draft={draft}
-        auth={buildAuthCfg()}
         onCommitted={async () => {
           await onCoupled?.();
           onClose();
@@ -408,10 +400,9 @@ export default function AddSystemPanel({
                 />
                 {engineLive && (
                   <p className="font-mono text-[0.62rem] uppercase tracking-wider text-acid">
-                    ● engine live — the model reads your notes, then confirms its reading with you before committing
+                    ● engine live — the model reads your notes, then confirms its reading (and how it authenticates) with you before committing
                   </p>
                 )}
-                {authFields}
               </div>
             )}
           </div>

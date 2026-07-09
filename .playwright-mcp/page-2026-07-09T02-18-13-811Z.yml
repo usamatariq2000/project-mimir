@@ -1,0 +1,46 @@
+- generic [active] [ref=f2e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=f2e3]:
+    - banner [ref=f2e4]:
+      - generic [ref=f2e5]:
+        - link "MIMIR DECK" [ref=f2e6]:
+          - /url: /
+          - generic [ref=f2e8]: MIMIR DECK
+        - generic [ref=f2e9]:
+          - button "Deck" [pressed] [ref=f2e10]
+          - button "Monitor" [ref=f2e11]
+      - generic [ref=f2e12]:
+        - button "?" [ref=f2e13]
+        - generic [ref=f2e14]: 3 systems · demo mode
+        - generic [ref=f2e16]: operator
+        - button "⏻ Log out" [ref=f2e17]:
+          - text: ⏻
+          - generic [ref=f2e18]: Log out
+    - main [ref=f2e19]:
+      - paragraph [ref=f2e20]: Operating all systems
+      - heading "State your intent." [level=1] [ref=f2e21]
+      - generic [ref=f2e23]:
+        - generic [ref=f2e24]: ❯
+        - textbox "Intent" [ref=f2e25]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=f2e26]
+      - list [ref=f2e27]:
+        - listitem [ref=f2e28]:
+          - button "Refund every failed payment from yesterday" [ref=f2e29]
+        - listitem [ref=f2e30]:
+          - button "Which products will run out of stock this week?" [ref=f2e31]
+        - listitem [ref=f2e32]:
+          - button "Close all resolved tickets older than 7 days" [ref=f2e33]
+    - contentinfo [ref=f2e34]:
+      - generic [ref=f2e35]: Systems
+      - button "Stripe" [ref=f2e37]: Stripe
+      - button "Shopify" [ref=f2e40]: Shopify
+      - button "Zendesk" [ref=f2e43]: Zendesk
+      - button "+ couple a system" [ref=f2e45]
+  - button "Open Next.js Dev Tools" [ref=f2e51] [cursor=pointer]:
+    - img [ref=f2e52]
+  - alert [ref=f2e55]

@@ -4,9 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   engineClarifyDraft,
   engineCommitSystem,
+  engineDiscoverLogin,
   type CoupleAuth,
   type DraftInterpretation,
 } from "../lib/engine";
+
+type AuthMethod = CoupleAuth["type"];
 
 /* Commissioning terminal — verify-before-commit onboarding. The engine has
    inferred an interpretation from pasted docs; here the operator reviews the
@@ -19,13 +22,11 @@ type Msg = { role: "ai" | "operator"; content: string };
 export default function CommissioningTerminal({
   name,
   draft,
-  auth,
   onCommitted,
   onClose,
 }: {
   name: string;
   draft: DraftInterpretation;
-  auth?: CoupleAuth;
   onCommitted: () => Promise<void> | void;
   onClose: () => void;
 }) {
@@ -37,6 +38,57 @@ export default function CommissioningTerminal({
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
+
+  // Authentication for the target API — captured HERE in the interview (not a chat
+  // message; secrets go in masked fields). The service account is the API's own
+  // credential, separate from the operator's Mimir login.
+  const [authType, setAuthType] = useState<AuthMethod>("none");
+  const [authToken, setAuthToken] = useState("");
+  const [authHeader, setAuthHeader] = useState("X-API-Key");
+  const [authValue, setAuthValue] = useState("");
+  const [svcUser, setSvcUser] = useState("");
+  const [svcPass, setSvcPass] = useState("");
+  const [loginPath, setLoginPath] = useState("");
+  const [discovering, setDiscovering] = useState(false);
+  const [loginRecipe, setLoginRecipe] = useState<Record<string, unknown> | null>(null);
+  const [discoverMsg, setDiscoverMsg] = useState<string | null>(null);
+
+  const buildAuth = (): CoupleAuth =>
+    authType === "bearer"
+      ? { type: "bearer", token: authToken }
+      : authType === "api_key"
+        ? { type: "api_key", header: authHeader, value: authValue }
+        : authType === "basic"
+          ? { type: "basic", username: svcUser, password: svcPass }
+          : authType === "login" && loginRecipe
+            ? { type: "login", username: svcUser, password: svcPass, recipe: loginRecipe }
+            : { type: "none" };
+
+  const runDiscover = async () => {
+    const base = (interp.base_url ?? "").trim();
+    if (!base) {
+      setDiscoverMsg("Confirm the base URL in the interview first — I need a host to test the login against.");
+      return;
+    }
+    if (!svcUser.trim() || !svcPass.trim()) {
+      setDiscoverMsg("Enter the service-account username and password first.");
+      return;
+    }
+    setDiscovering(true);
+    setDiscoverMsg(null);
+    setLoginRecipe(null);
+    const res = await engineDiscoverLogin(base, svcUser.trim(), svcPass.trim(), { loginPath: loginPath.trim() || undefined });
+    setDiscovering(false);
+    if (res?.ok && res.recipe) {
+      setLoginRecipe(res.recipe as unknown as Record<string, unknown>);
+      setDiscoverMsg(`✓ Login proven — token field "${res.recipe.token_path}". Sample token ${res.token_preview ?? ""}`);
+    } else {
+      setDiscoverMsg(res?.reason ? `✗ ${res.reason}` : "✗ Couldn't verify the login — check the path and credentials.");
+    }
+  };
+
+  // 'login' isn't decided until its recipe is proven; other methods are set as chosen
+  const authDecided = authType !== "login" || loginRecipe !== null;
 
   // deterministic local edit — click a tool's badge to gate/ungate it. The edited
   // interpretation is what gets committed, so this sticks.
@@ -56,7 +108,8 @@ export default function CommissioningTerminal({
         ? `I read your notes and interpreted ${draft.tools.length} operation(s). Everything looks unambiguous — review the reading on the left and commit when it's right.`
         : `I read your notes and interpreted ${draft.tools.length} operation(s). Before I commit this system I need to confirm ${gaps.length} thing(s):`;
     const qs = gaps.map((g, i) => `${i + 1}. ${g.question}`).join("\n");
-    setMessages([{ role: "ai", content: qs ? `${opening}\n\n${qs}` : opening }]);
+    const authAsk = "\n\nAlso — how does this API authenticate? Pick a method under “Authentication” below. If it issues tokens from a login, choose “login (auto-token)” and give me a service account; I’ll test it before we save.";
+    setMessages([{ role: "ai", content: (qs ? `${opening}\n\n${qs}` : opening) + authAsk }]);
   }, [draft]);
 
   useEffect(() => {
@@ -65,7 +118,7 @@ export default function CommissioningTerminal({
 
   const gaps = interp.gaps ?? [];
   const caps = interp.capabilities ?? {};
-  const canCommit = (interp.base_url ?? "").trim().length > 0 && interp.tools.length > 0 && confirmed;
+  const canCommit = (interp.base_url ?? "").trim().length > 0 && interp.tools.length > 0 && confirmed && authDecided;
   // suggested vocabulary + anything the operator confirmed, shown together
   const glossary = { ...(caps.glossary_suggestions ?? {}), ...(interp.context?.glossary ?? {}) };
   const gatedCount = interp.tools.filter((t) => t.permission === "approval").length;
@@ -95,7 +148,7 @@ export default function CommissioningTerminal({
     if (!canCommit || committing) return;
     setCommitting(true);
     setError(null);
-    const res = await engineCommitSystem(name, interp, auth);
+    const res = await engineCommitSystem(name, interp, buildAuth());
     setCommitting(false);
     if (!res) {
       setError("Commit failed — check the base URL is reachable and try again.");
@@ -245,6 +298,58 @@ export default function CommissioningTerminal({
             </div>
 
             <div className="rule-t p-3">
+              <p className="mb-1.5 font-mono text-[0.62rem] uppercase tracking-wider text-ash">
+                Authentication <span className="text-dust">— how Mimir authenticates to this API</span>
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {(["none", "bearer", "api_key", "basic", "login"] as const).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setAuthType(t)}
+                    className={`border px-2.5 py-1 font-mono text-[0.6rem] uppercase tracking-wider transition-colors ${authType === t ? "border-acid bg-acid/10 text-acid" : "border-rule text-ash hover:border-dust"}`}
+                  >
+                    {t === "api_key" ? "API key" : t === "login" ? "login (auto-token)" : t}
+                  </button>
+                ))}
+              </div>
+              {authType === "bearer" && (
+                <input className="field mt-2 font-mono" type="password" placeholder="Bearer token" value={authToken} onChange={(e) => setAuthToken(e.target.value)} aria-label="Bearer token" />
+              )}
+              {authType === "api_key" && (
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <input className="field font-mono" placeholder="Header name" value={authHeader} onChange={(e) => setAuthHeader(e.target.value)} aria-label="API key header" />
+                  <input className="field font-mono" type="password" placeholder="Key value" value={authValue} onChange={(e) => setAuthValue(e.target.value)} aria-label="API key value" />
+                </div>
+              )}
+              {authType === "basic" && (
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <input className="field font-mono" placeholder="Username" value={svcUser} onChange={(e) => setSvcUser(e.target.value)} aria-label="Basic auth username" />
+                  <input className="field font-mono" type="password" placeholder="Password" value={svcPass} onChange={(e) => setSvcPass(e.target.value)} aria-label="Basic auth password" />
+                </div>
+              )}
+              {authType === "login" && (
+                <div className="mt-2 space-y-2">
+                  <p className="font-mono text-[0.58rem] text-dust">
+                    Give a dedicated service account for this API. Mimir tests the login, then mints &amp; refreshes tokens itself.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input className="field font-mono" placeholder="Service-account username" value={svcUser} onChange={(e) => setSvcUser(e.target.value)} aria-label="Service account username" />
+                    <input className="field font-mono" type="password" placeholder="Password" value={svcPass} onChange={(e) => setSvcPass(e.target.value)} aria-label="Service account password" />
+                  </div>
+                  <input className="field font-mono" placeholder="Login path (optional — e.g. /auth/login)" value={loginPath} onChange={(e) => setLoginPath(e.target.value)} aria-label="Login path" />
+                  <button type="button" onClick={runDiscover} disabled={discovering} className="border border-rule px-3 py-1.5 font-mono text-[0.7rem] text-bone hover:border-dust disabled:opacity-40">
+                    {discovering ? "testing login…" : "Test & discover"}
+                  </button>
+                  {discoverMsg && <p className={`font-mono text-[0.6rem] ${loginRecipe ? "text-acid" : "text-ember"}`}>{discoverMsg}</p>}
+                </div>
+              )}
+              {authType !== "none" && (
+                <p className="mt-1.5 font-mono text-[0.58rem] text-dust">Sealed in the vault (encrypted). The AI never sees it.</p>
+              )}
+            </div>
+
+            <div className="rule-t p-3">
               <p className="mb-2 text-xs text-bone">{holistic}</p>
               <label className="mb-2 flex cursor-pointer items-start gap-2">
                 <input
@@ -258,6 +363,7 @@ export default function CommissioningTerminal({
                 <span className="font-mono text-[0.66rem] text-ash">
                   I&apos;ve reviewed this reading and it&apos;s correct.
                   {(interp.base_url ?? "").trim().length === 0 && " (set a base URL first)"}
+                  {!authDecided && " (test the service-account login first)"}
                   {gaps.length > 0 && ` ${gaps.length} question(s) still open.`}
                 </span>
               </label>

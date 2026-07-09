@@ -47,6 +47,7 @@ export default function AddSystemPanel({
   const [result, setResult] = useState<EvalResult | null>(null);
   const [draft, setDraft] = useState<DraftInterpretation | null>(null);
   const [drafting, setDrafting] = useState(false);
+  const [draftElapsed, setDraftElapsed] = useState(0);
   // login scheme (Credential Broker): service-account creds → discovered login recipe
   const [loginPath, setLoginPath] = useState("");
   const [discovering, setDiscovering] = useState(false);
@@ -161,14 +162,17 @@ export default function AddSystemPanel({
   const startEvaluation = async () => {
     if (mode === "text" && engineLive) {
       setDrafting(true);
+      setDraftElapsed(0);
       setCoupleError(null);
-      const d = await engineDraftSystem(name.trim(), { doc: notes.trim() }, baseUrl.trim());
+      const d = await engineDraftSystem(name.trim(), { doc: notes.trim() }, baseUrl.trim(), undefined, setDraftElapsed);
       setDrafting(false);
       if (d) {
         setDraft(d);
         return;
       }
-      setCoupleError("The engine could not infer operations from those docs — add clearer endpoint/method details.");
+      setCoupleError(
+        "The engine couldn't finish reading those docs. On the local model a large API can take a few minutes — try again, paste a smaller section, or point at a stronger model."
+      );
       return;
     }
     setEvaluating(true);
@@ -414,7 +418,7 @@ export default function AddSystemPanel({
             className="btn-primary mt-4 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {drafting
-              ? "Reading your notes…"
+              ? `Reading your notes… ${draftElapsed}s${draftElapsed > 20 ? " · large APIs take a few minutes on the local model" : ""}`
               : mode === "text"
                 ? engineLive
                   ? "Commission this system"

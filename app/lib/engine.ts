@@ -19,7 +19,13 @@ export function clearToken() {
 }
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
   const t = getToken();
-  return { ...(extra ?? {}), ...(t ? { authorization: `Bearer ${t}` } : {}) };
+  return {
+    // ngrok free serves a browser-warning page unless this header is present —
+    // set it so API fetches reach the engine (harmless when not behind ngrok)
+    "ngrok-skip-browser-warning": "true",
+    ...(extra ?? {}),
+    ...(t ? { authorization: `Bearer ${t}` } : {}),
+  };
 }
 
 export interface AuthUser {
@@ -36,7 +42,7 @@ export async function engineAuth(
   try {
     const res = await fetch(`${ENGINE_URL}/auth/${mode}`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: authHeaders({ "content-type": "application/json" }),
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
@@ -302,12 +308,16 @@ export interface DraftInterpretation {
   gaps: DraftGap[];
 }
 
-/** Step 1 — infer an interpretation + its open questions. Nothing is persisted. */
+/** Step 1 — infer an interpretation + its open questions. Nothing is persisted.
+ *  Drafting a large API can take minutes on a local model, so the engine runs it as a
+ *  background job and we POLL — no single request is held open long enough to time out.
+ *  `onProgress` is called with elapsed seconds so the UI can reassure the operator. */
 export async function engineDraftSystem(
   name: string,
   source: { specUrl?: string; doc?: string },
   baseUrl?: string,
-  context?: BusinessContext
+  context?: BusinessContext,
+  onProgress?: (elapsedSeconds: number) => void
 ): Promise<DraftInterpretation | null> {
   try {
     const res = await fetch(`${ENGINE_URL}/systems/draft`, {
@@ -316,7 +326,26 @@ export async function engineDraftSystem(
       body: JSON.stringify({ name, base_url: baseUrl, spec_url: source.specUrl, doc: source.doc, context }),
     });
     if (!res.ok) return null;
-    return (await res.json()) as DraftInterpretation;
+    const { job_id } = (await res.json()) as { job_id?: string };
+    if (!job_id) return null;
+
+    const started = Date.now();
+    // poll up to ~10 minutes (big docs on the local 7B are slow but do finish)
+    for (let i = 0; i < 200; i++) {
+      await new Promise((r) => setTimeout(r, 3000));
+      onProgress?.(Math.round((Date.now() - started) / 1000));
+      let job: { status: string; result?: DraftInterpretation };
+      try {
+        const s = await fetch(`${ENGINE_URL}/systems/draft/${job_id}`, { cache: "no-store", headers: authHeaders() });
+        if (!s.ok) continue; // transient — keep polling
+        job = await s.json();
+      } catch {
+        continue;
+      }
+      if (job.status === "done" && job.result) return job.result;
+      if (job.status === "error") return null;
+    }
+    return null;
   } catch {
     return null;
   }

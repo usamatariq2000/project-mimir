@@ -165,6 +165,15 @@ The engine runs WITHOUT `--reload`; **restart it after editing `app/` Python** t
 - ~~Auth capture for doc-based systems~~ **DONE 2026-07-08** — the auth UI (bearer/api_key/basic) now
   renders in the text-doc path and flows through the commissioning commit; verified auth_type persists
   and the token never leaks. Doc-only APIs that need a token can now be tested live.
+- ~~Credential recovery (expired token)~~ **DONE 2026-07-09** — `PATCH /systems/{id}/auth` rotates a
+  credential in place (no re-coupling); the executor tags 401/403 as `auth_error` with a reconnect
+  hint; the deck has a ⟳ Reconnect button per live system. `eval/reauth_check` 4/4, harness 9/9.
+  This is the first slice of the **Credential Broker** (below).
+- **Credential Broker** (designed, not built) — service-account creds → discover the login endpoint
+  during commissioning (AI proposes, human confirms, test-login against the real response, freeze a
+  deterministic recipe) → runtime obtains/refreshes tokens and, on 401, refreshes+retries. Covers
+  username/password→token, cookie-session, OAuth2-client-creds; honest-refuses request-signing/mTLS/
+  interactive-MFA. The `auth_error` hook above is where refresh will plug in. Write the design doc first.
 - **`{baseurl}` mid-path normalization** — a literal `{baseurl}`/`{host}` token in pasted docs makes
   the model emit a path not starting with `/`, which gets dropped. Add a strip/normalize step.
 - **OAuth2 vault scheme** — only bearer/api_key/basic today; OAuth2 client-credentials needs a new

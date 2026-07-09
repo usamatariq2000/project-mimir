@@ -179,6 +179,16 @@ execution layer powering that transformation.
 
 <!-- SCOPE-SYNC: keep this section in sync with the actual code. Updated by the Stop hook + /init command. -->
 
+- **2026-07-09 (credential recovery):** an expired/revoked token no longer means deleting and
+  re-coupling a system (which would lose its context + knowledge). `PATCH /systems/{id}/auth` rotates
+  the vaulted credential in place; the executor now tags a 401/403 as `auth_error` with a "reconnect"
+  hint instead of a generic failure (also the hook the future Credential Broker will use to
+  auto-refresh); the deck shows a ⟳ Reconnect button on each live system that opens a small panel to
+  set the new credential. Verified: `eval/reauth_check` 4/4 (wrong token → auth failure surfaced →
+  rotate in place → same system recovers), intent harness still 9/9, in-browser rotate confirmed
+  (auth_type changes, token never leaks). First slice of the **Credential Broker** design (service-
+  account login-recipe with AI-discovered, human-confirmed, code-executed token acquisition/refresh).
+
 - **2026-07-07 (commissioning — verify the whole reading + take suggestions):** the interview now
   covers more than base URL + writes. The engine extracts **domain vocabulary** from the docs and asks
   the operator to confirm/correct it (confirmed terms feed the grounding glossary); flags **reads that

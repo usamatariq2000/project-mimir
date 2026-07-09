@@ -179,6 +179,21 @@ execution layer powering that transformation.
 
 <!-- SCOPE-SYNC: keep this section in sync with the actual code. Updated by the Stop hook + /init command. -->
 
+- **2026-07-09 (doc ingestion made AI-driven + robust at scale):** three fixes so real-world
+  undocumented APIs work. (1) **AI understands, code validates** (new Doctrine #13): removed the
+  code that guessed HTTP-method spellings / path-param styles — the inference PROMPT now normalizes
+  any doc convention (DEL→DELETE, `:id`/`<id>`→`{id}`) and code only validates against the saved HTTP
+  methods. (2) **No more all-or-nothing truncation**: leaner per-op output + higher token budget +
+  salvage of completed operations if the JSON is cut off; `evaluate_capabilities` reasons about the
+  SYSTEM (purpose/joint/risks/glossary) instead of re-describing every route. A ~80-endpoint doc now
+  yields all ~83 tools. (3) **Async draft**: `POST /systems/draft` returns `202 + job_id` and runs
+  inference as a background job the client POLLS (`GET /systems/draft/{job_id}`) — a big API takes
+  minutes on the local 7B, and a single blocking request was timing out in the browser→ngrok→Next
+  chain and showing a misleading "could not infer" error. The deck now shows live elapsed-time
+  progress. Also fixed `/health` to be instant (cached liveness) so the deck never strands in demo
+  mode. Note: the local 7B is slow (~4.5 min for 80 endpoints) and occasionally mislabels a method
+  (corrected in the interview) — a stronger `LLM_MODEL` fixes both, zero code change.
+
 - **2026-07-09 (auth capture moved into the commissioning interview):** the per-API credential is now
   set DURING onboarding, not in a pre-step. The commissioning terminal owns the Authentication step
   (none / bearer / API key / basic / login-auto-token) with masked fields and a "Test & discover"

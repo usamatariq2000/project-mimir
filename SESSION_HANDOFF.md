@@ -174,9 +174,12 @@ The engine runs WITHOUT `--reload`; **restart it after editing `app/` Python** t
   mints/caches/re-logins on 401); `POST /systems/discover-login` has the AI find the login endpoint +
   token field and PROVE it with a real test-login; the deck's "login (auto-token)" auth option runs
   discovery and couples with the recipe. `eval/broker_check` 6/6, harness 9/9, in-browser verified.
+  Auth capture now lives INSIDE the commissioning interview (the terminal's Authentication step, masked
+  fields + Test & discover); the OpenAPI path keeps its pre-couple auth panel. Note: **operator's Mimir
+  login** (users table) is separate from the per-API **service account** (vault).
   **Still to do on the broker:** cookie-session inject target, a refresh-token endpoint (vs re-login),
-  OAuth2 client-credentials as a recipe variant, and wiring discovery into the commissioning interview
-  (today it's in the coupling auth panel). Request-signing/mTLS/interactive-MFA remain out (honest-refuse).
+  and OAuth2 client-credentials as a recipe variant. Request-signing/mTLS/interactive-MFA remain out
+  (honest-refuse).
 - **`{baseurl}` mid-path normalization** — a literal `{baseurl}`/`{host}` token in pasted docs makes
   the model emit a path not starting with `/`, which gets dropped. Add a strip/normalize step.
 - **OAuth2 vault scheme** — only bearer/api_key/basic today; OAuth2 client-credentials needs a new

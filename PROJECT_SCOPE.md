@@ -179,6 +179,17 @@ execution layer powering that transformation.
 
 <!-- SCOPE-SYNC: keep this section in sync with the actual code. Updated by the Stop hook + /init command. -->
 
+- **2026-07-09 (auth capture moved into the commissioning interview):** the per-API credential is now
+  set DURING onboarding, not in a pre-step. The commissioning terminal owns the Authentication step
+  (none / bearer / API key / basic / login-auto-token) with masked fields and a "Test & discover"
+  button for the login scheme (which uses the base URL the interview just confirmed); the AI asks about
+  auth in its opening message and commit is gated until auth is decided (login requires a proven
+  recipe). Credentials go in secure fields, never into the chat log. Clarified distinction: the
+  operator's **Mimir login** (their platform account) is separate from the per-API **service account**
+  (the customer's dedicated "AI operator" user on their own system, stored in the vault). Verified
+  in-browser end-to-end: doc → interview → "login (auto-token)" → discovered + proven → committed as
+  auth_type=login (creds never leak). OpenAPI path keeps its pre-couple auth panel (no interview).
+
 - **2026-07-09 (Credential Broker — the AI operator logs itself in):** for APIs that issue tokens via
   a login endpoint (most REST/mobile backends), the customer gives Mimir a dedicated **service-account
   credential** and the engine handles tokens itself — no pasting/rotating expiring tokens. New

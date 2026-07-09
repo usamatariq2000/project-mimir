@@ -169,11 +169,14 @@ The engine runs WITHOUT `--reload`; **restart it after editing `app/` Python** t
   credential in place (no re-coupling); the executor tags 401/403 as `auth_error` with a reconnect
   hint; the deck has a ⟳ Reconnect button per live system. `eval/reauth_check` 4/4, harness 9/9.
   This is the first slice of the **Credential Broker** (below).
-- **Credential Broker** (designed, not built) — service-account creds → discover the login endpoint
-  during commissioning (AI proposes, human confirms, test-login against the real response, freeze a
-  deterministic recipe) → runtime obtains/refreshes tokens and, on 401, refreshes+retries. Covers
-  username/password→token, cookie-session, OAuth2-client-creds; honest-refuses request-signing/mTLS/
-  interactive-MFA. The `auth_error` hook above is where refresh will plug in. Write the design doc first.
+- ~~Credential Broker~~ **BUILT 2026-07-09** — service-account creds → the engine mints & refreshes
+  tokens itself. `auth_type=login` stores creds + a deterministic login recipe (`app/broker.py`
+  mints/caches/re-logins on 401); `POST /systems/discover-login` has the AI find the login endpoint +
+  token field and PROVE it with a real test-login; the deck's "login (auto-token)" auth option runs
+  discovery and couples with the recipe. `eval/broker_check` 6/6, harness 9/9, in-browser verified.
+  **Still to do on the broker:** cookie-session inject target, a refresh-token endpoint (vs re-login),
+  OAuth2 client-credentials as a recipe variant, and wiring discovery into the commissioning interview
+  (today it's in the coupling auth panel). Request-signing/mTLS/interactive-MFA remain out (honest-refuse).
 - **`{baseurl}` mid-path normalization** — a literal `{baseurl}`/`{host}` token in pasted docs makes
   the model emit a path not starting with `/`, which gets dropped. Add a strip/normalize step.
 - **OAuth2 vault scheme** — only bearer/api_key/basic today; OAuth2 client-credentials needs a new

@@ -179,6 +179,20 @@ execution layer powering that transformation.
 
 <!-- SCOPE-SYNC: keep this section in sync with the actual code. Updated by the Stop hook + /init command. -->
 
+- **2026-07-09 (Credential Broker — the AI operator logs itself in):** for APIs that issue tokens via
+  a login endpoint (most REST/mobile backends), the customer gives Mimir a dedicated **service-account
+  credential** and the engine handles tokens itself — no pasting/rotating expiring tokens. New
+  `auth_type=login` stores the creds + a deterministic **login recipe** encrypted; `app/broker.py`
+  calls the login API, caches the token with its expiry, and **transparently re-logins on a 401**.
+  `POST /systems/discover-login` is the AI-discovery step: the model proposes the login endpoint (from
+  the docs, or an explicit path) and, after a **real test-login**, locates the token/expiry field in
+  the actual response — then a deterministic recipe is frozen (AI discovers, code executes — Doctrine
+  #2/#7). The deck's auth panel gains a **"login (auto-token)"** option with a Test &amp; discover button.
+  Verified: `eval/broker_check` 6/6 (discover → couple → mint → re-login after invalidation → honest
+  fail on bad creds), intent harness 9/9, in-browser discovery proven. Remaining broker work: cookie
+  inject target, refresh-token endpoints, OAuth2 client-creds variant, discovery inside commissioning.
+  Out of scope (honest-refuse): request-signing (SigV4/HMAC), mTLS, interactive MFA/CAPTCHA.
+
 - **2026-07-09 (credential recovery):** an expired/revoked token no longer means deleting and
   re-coupling a system (which would lose its context + knowledge). `PATCH /systems/{id}/auth` rotates
   the vaulted credential in place; the executor now tags a 401/403 as `auth_error` with a "reconnect"

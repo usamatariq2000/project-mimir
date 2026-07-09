@@ -21,6 +21,7 @@ import TourGuide, { startTour } from "./TourGuide";
 import MonitorPanel from "./MonitorPanel";
 import MarkdownMessage from "./MarkdownMessage";
 import AddSystemPanel from "./AddSystemPanel";
+import ReconnectPanel from "./ReconnectPanel";
 import { engineHealth, engineSystems, engineRunIntent, engineResolve, engineChat, engineStreamResolve, engineRuns, engineMemories, engineMe, getToken, clearToken, type AuthUser, type EngineActivity, type EngineHealth, type EngineRun, type PendingAction, type StreamHandlers } from "../lib/engine";
 import {
   SYSTEMS,
@@ -232,6 +233,7 @@ export default function CommandDeck() {
   const [sessionRuns, setSessionRuns] = useState<ActivityEntry[]>([]);
   const [added, setAdded] = useState<ConnectedSystem[]>([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [reconnect, setReconnect] = useState<{ id: string; name: string } | null>(null);
   const [live, setLive] = useState<EngineHealth | null>(null);
   const [held, setHeld] = useState<{ id: string; pending: PendingAction[] } | null>(null);
   const [feed, setFeed] = useState<{ role: "op" | "mimir"; text: string }[]>([]);
@@ -662,6 +664,14 @@ export default function CommandDeck() {
           onClose={() => setShowAdd(false)}
         />
       )}
+      {reconnect && (
+        <ReconnectPanel
+          systemId={reconnect.id}
+          systemName={reconnect.name}
+          onDone={async () => setLiveSystems(await engineSystems())}
+          onClose={() => setReconnect(null)}
+        />
+      )}
       <TourGuide ready={booted && tab === "deck" && view === "calm"} setTab={setTab} />
 
       {/* ── Monitor tab ── */}
@@ -871,23 +881,39 @@ export default function CommandDeck() {
         <span className="flex shrink-0 items-center px-4 font-mono text-[0.6rem] uppercase tracking-[0.15em] text-dust">
           Systems
         </span>
-        {allSystems.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => setFocus(focus === s.id ? null : s.id)}
-            aria-pressed={focus === s.id}
-            className={`flex shrink-0 items-center gap-2 border-l border-rule px-5 py-3 font-mono text-[0.7rem] uppercase tracking-wider transition-colors ${
-              focus === s.id ? "bg-acid text-carbon" : "text-ash hover:bg-soot hover:text-bone"
-            }`}
-          >
-            <span
-              className={`h-1.5 w-1.5 ${s.status === "online" ? "bg-acid" : "bg-ember"} ${focus === s.id ? "!bg-carbon" : ""}`}
-              aria-hidden
-            />
-            {s.name}
-          </button>
-        ))}
+        {allSystems.map((s) => {
+          // only engine-coupled (real) systems can have their credential rotated
+          const isLive = liveSystems?.some((ls) => ls.id === s.id) ?? false;
+          return (
+            <div key={s.id} className="flex shrink-0 items-stretch border-l border-rule">
+              <button
+                type="button"
+                onClick={() => setFocus(focus === s.id ? null : s.id)}
+                aria-pressed={focus === s.id}
+                className={`flex shrink-0 items-center gap-2 px-5 py-3 font-mono text-[0.7rem] uppercase tracking-wider transition-colors ${
+                  focus === s.id ? "bg-acid text-carbon" : "text-ash hover:bg-soot hover:text-bone"
+                }`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 ${s.status === "online" ? "bg-acid" : "bg-ember"} ${focus === s.id ? "!bg-carbon" : ""}`}
+                  aria-hidden
+                />
+                {s.name}
+              </button>
+              {isLive && (
+                <button
+                  type="button"
+                  onClick={() => setReconnect({ id: s.id, name: s.name })}
+                  title="Reconnect — rotate this system's credential"
+                  aria-label={`Reconnect ${s.name}`}
+                  className="flex shrink-0 items-center px-2 font-mono text-xs text-dust transition-colors hover:bg-soot hover:text-acid"
+                >
+                  ⟳
+                </button>
+              )}
+            </div>
+          );
+        })}
         <button
           type="button"
           onClick={() => setShowAdd(true)}

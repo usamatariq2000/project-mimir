@@ -185,6 +185,25 @@ export interface BusinessContext {
   glossary?: Record<string, string>;
 }
 
+/** Rotate a coupled system's credential in place (recover from an expired/invalid
+ *  token without re-coupling). The secret is vaulted; only auth_type comes back. */
+export async function engineRotateAuth(
+  systemId: string,
+  auth: CoupleAuth
+): Promise<{ id: string; name: string; auth_type: string } | null> {
+  try {
+    const res = await fetch(`${ENGINE_URL}/systems/${systemId}/auth`, {
+      method: "PATCH",
+      headers: authHeaders({ "content-type": "application/json" }),
+      body: JSON.stringify({ auth }),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as { id: string; name: string; auth_type: string };
+  } catch {
+    return null;
+  }
+}
+
 export async function engineCoupleSystem(
   name: string,
   // documented API → specUrl; undocumented API → doc (pasted human-written docs)

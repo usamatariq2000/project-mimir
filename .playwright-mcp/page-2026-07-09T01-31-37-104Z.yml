@@ -1,0 +1,46 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "MIMIR DECK" [ref=e6]:
+          - /url: /
+          - generic [ref=e8]: MIMIR DECK
+        - generic [ref=e9]:
+          - button "Deck" [pressed] [ref=e10]
+          - button "Monitor" [ref=e11]
+      - generic [ref=e12]:
+        - button "?" [ref=e13]
+        - generic [ref=e14]: 1 systems · engine live
+        - generic [ref=e16]: Eval Bot
+        - button "⏻ Log out" [ref=e17]:
+          - text: ⏻
+          - generic [ref=e18]: Log out
+    - main [ref=e42]:
+      - paragraph [ref=e43]: Operating all systems
+      - heading "State your intent." [level=1] [ref=e44]
+      - generic [ref=e46]:
+        - generic [ref=e47]: ❯
+        - textbox "Intent" [ref=e48]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=e49]
+      - list [ref=e50]:
+        - listitem [ref=e51]:
+          - button "Refund every failed payment from yesterday" [ref=e52]
+        - listitem [ref=e53]:
+          - button "Which products will run out of stock this week?" [ref=e54]
+        - listitem [ref=e55]:
+          - button "Close all resolved tickets older than 7 days" [ref=e56]
+    - contentinfo [ref=e57]:
+      - generic [ref=e58]: Systems
+      - generic [ref=e79]:
+        - button "Acme Commerce" [ref=e80]: Acme Commerce
+        - button "Reconnect Acme Commerce" [ref=e82]: ⟳
+      - button "+ couple a system" [ref=e68]
+  - button "Open Next.js Dev Tools" [ref=e74] [cursor=pointer]:
+    - img [ref=e75]
+  - alert [ref=e78]

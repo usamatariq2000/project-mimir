@@ -1,0 +1,69 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - generic: +
+    - generic: +
+    - generic: +
+    - generic: +
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "MIMIR DECK" [ref=e6]:
+          - /url: /
+          - generic [ref=e8]: MIMIR DECK
+        - generic [ref=e9]:
+          - button "Deck" [pressed] [ref=e10]
+          - button "Monitor" [ref=e11]
+      - generic [ref=e12]:
+        - button "?" [ref=e13]
+        - generic [ref=e14]: 3 systems · demo mode
+        - generic [ref=e16]: operator
+        - button "⏻ Log out" [ref=e17]:
+          - text: ⏻
+          - generic [ref=e18]: Log out
+    - status "System preflight check" [ref=e19]:
+      - generic [ref=e20]:
+        - paragraph [ref=e21]: Preflight · deck boot sequence
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - generic [ref=e24]: vault seal integrity
+            - generic [ref=e25]: ✓ ok
+          - generic [ref=e26]:
+            - generic [ref=e27]: tool registry checksum
+            - generic [ref=e28]: ✓ ok
+          - generic [ref=e29]:
+            - generic [ref=e30]: stripe coupling · ping
+            - generic [ref=e31]: ✓ ok
+          - generic [ref=e32]:
+            - generic [ref=e33]: shopify coupling · ping
+            - generic [ref=e34]: ✓ ok
+          - generic [ref=e35]:
+            - generic [ref=e36]: zendesk coupling · ping
+            - generic [ref=e37]: ✓ ok
+          - generic [ref=e38]:
+            - generic [ref=e39]: audit tape writable
+            - generic [ref=e40]: ✓ ok
+        - paragraph [ref=e41]: All systems nominal — deck unlocked
+    - main [ref=e42]:
+      - paragraph [ref=e43]: Operating all systems
+      - heading "State your intent." [level=1] [ref=e44]
+      - generic [ref=e46]:
+        - generic [ref=e47]: ❯
+        - textbox "Intent" [ref=e48]:
+          - /placeholder: Refund every failed payment from yesterday and email the customers
+        - button "Run" [ref=e49]
+      - list [ref=e50]:
+        - listitem [ref=e51]:
+          - button "Refund every failed payment from yesterday" [ref=e52]
+        - listitem [ref=e53]:
+          - button "Which products will run out of stock this week?" [ref=e54]
+        - listitem [ref=e55]:
+          - button "Close all resolved tickets older than 7 days" [ref=e56]
+    - contentinfo [ref=e57]:
+      - generic [ref=e58]: Systems
+      - button "Stripe" [ref=e60]: Stripe
+      - button "Shopify" [ref=e63]: Shopify
+      - button "Zendesk" [ref=e66]: Zendesk
+      - button "+ couple a system" [ref=e68]
+  - button "Open Next.js Dev Tools" [ref=e74] [cursor=pointer]:
+    - img [ref=e75]
+  - alert [ref=e78]

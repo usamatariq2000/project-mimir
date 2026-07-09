@@ -172,12 +172,46 @@ export function engineResolve(runId: string, approved: boolean): Promise<EngineR
 /** Couple a new system for real: the engine ingests the spec, machines the
     tools, and runs the capability evaluation. */
 export interface CoupleAuth {
-  type: "none" | "bearer" | "api_key" | "basic";
+  type: "none" | "bearer" | "api_key" | "basic" | "login";
   token?: string;
   header?: string;
   value?: string;
   username?: string;
   password?: string;
+  // login scheme: service-account creds (username/password) + a proven login recipe
+  recipe?: Record<string, unknown>;
+}
+
+export interface LoginRecipe {
+  login_path: string;
+  method?: string;
+  username_field?: string;
+  password_field?: string;
+  token_path: string;
+  expiry_path?: string;
+  expiry_default_s?: number;
+}
+
+/** Probe a login flow: AI proposes the endpoint + token field, a real test-login
+ *  proves it, and a deterministic recipe comes back for the operator to confirm.
+ *  The token is never returned — only a masked preview. */
+export async function engineDiscoverLogin(
+  baseUrl: string,
+  username: string,
+  password: string,
+  opts?: { doc?: string; loginPath?: string }
+): Promise<{ ok: boolean; recipe?: LoginRecipe; reason?: string; token_preview?: string; response_keys?: string[] } | null> {
+  try {
+    const res = await fetch(`${ENGINE_URL}/systems/discover-login`, {
+      method: "POST",
+      headers: authHeaders({ "content-type": "application/json" }),
+      body: JSON.stringify({ base_url: baseUrl, username, password, doc: opts?.doc, login_path: opts?.loginPath }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 export interface BusinessContext {

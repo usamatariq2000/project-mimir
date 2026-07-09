@@ -6,6 +6,7 @@ import CommissioningTerminal from "./CommissioningTerminal";
 import {
   engineCoupleSystem,
   engineDraftSystem,
+  engineDiscoverLogin,
   type CoupleAuth,
   type BusinessContext,
   type DraftInterpretation,
@@ -46,6 +47,43 @@ export default function AddSystemPanel({
   const [result, setResult] = useState<EvalResult | null>(null);
   const [draft, setDraft] = useState<DraftInterpretation | null>(null);
   const [drafting, setDrafting] = useState(false);
+  // login scheme (Credential Broker): service-account creds → discovered login recipe
+  const [loginPath, setLoginPath] = useState("");
+  const [discovering, setDiscovering] = useState(false);
+  const [loginRecipe, setLoginRecipe] = useState<Record<string, unknown> | null>(null);
+  const [discoverMsg, setDiscoverMsg] = useState<string | null>(null);
+
+  const effectiveBaseUrl = (): string => {
+    const b = baseUrl.trim();
+    if (b) return b;
+    try {
+      return specUrl.trim() ? new URL(specUrl.trim()).origin : "";
+    } catch {
+      return "";
+    }
+  };
+
+  const runDiscover = async () => {
+    const base = effectiveBaseUrl();
+    if (!base || !authUser.trim() || !authPass.trim()) {
+      setDiscoverMsg("Enter the base URL, service-account username and password first.");
+      return;
+    }
+    setDiscovering(true);
+    setDiscoverMsg(null);
+    setLoginRecipe(null);
+    const res = await engineDiscoverLogin(base, authUser.trim(), authPass.trim(), {
+      doc: mode === "text" ? notes.trim() : undefined,
+      loginPath: loginPath.trim() || undefined,
+    });
+    setDiscovering(false);
+    if (res?.ok && res.recipe) {
+      setLoginRecipe(res.recipe as unknown as Record<string, unknown>);
+      setDiscoverMsg(`✓ Login proven — token field "${res.recipe.token_path}". Sample token ${res.token_preview ?? ""}`);
+    } else {
+      setDiscoverMsg(res?.reason ? `✗ ${res.reason}` : "✗ Couldn't verify the login — check the base URL, path, and credentials.");
+    }
+  };
 
   const canEvaluate =
     name.trim().length > 1 &&
@@ -150,7 +188,9 @@ export default function AddSystemPanel({
         ? { type: "api_key", header: authHeader, value: authValue }
         : authType === "basic"
           ? { type: "basic", username: authUser, password: authPass }
-          : { type: "none" };
+          : authType === "login" && loginRecipe
+            ? { type: "login", username: authUser, password: authPass, recipe: loginRecipe }
+            : { type: "none" };
 
   // shared auth UI — used by both the OpenAPI and text-doc paths so a doc-ingested
   // system can authenticate too (credentials are vaulted; the AI never sees them).
@@ -158,14 +198,14 @@ export default function AddSystemPanel({
     <div className="border-t border-rule-soft pt-3">
       <p className="mb-1.5 font-mono text-[0.65rem] uppercase tracking-wider text-ash">Authentication</p>
       <div className="flex flex-wrap gap-1.5">
-        {(["none", "bearer", "api_key", "basic"] as const).map((t) => (
+        {(["none", "bearer", "api_key", "basic", "login"] as const).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setAuthType(t)}
             className={`border px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-wider transition-colors ${authType === t ? "border-acid bg-acid/10 text-acid" : "border-rule text-ash hover:border-dust"}`}
           >
-            {t === "api_key" ? "API key" : t}
+            {t === "api_key" ? "API key" : t === "login" ? "login (auto-token)" : t}
           </button>
         ))}
       </div>
@@ -182,6 +222,30 @@ export default function AddSystemPanel({
         <div className="mt-2 grid grid-cols-2 gap-2">
           <input className="field font-mono" placeholder="Username" value={authUser} onChange={(e) => setAuthUser(e.target.value)} aria-label="Basic auth username" />
           <input className="field font-mono" type="password" placeholder="Password" value={authPass} onChange={(e) => setAuthPass(e.target.value)} aria-label="Basic auth password" />
+        </div>
+      )}
+      {authType === "login" && (
+        <div className="mt-2 space-y-2">
+          <p className="font-mono text-[0.6rem] text-dust">
+            Give a dedicated service-account login. Mimir discovers the login endpoint, proves it, then
+            mints &amp; refreshes tokens itself — so an expiring token never breaks operations.
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <input className="field font-mono" placeholder="Service-account username" value={authUser} onChange={(e) => setAuthUser(e.target.value)} aria-label="Service account username" />
+            <input className="field font-mono" type="password" placeholder="Password" value={authPass} onChange={(e) => setAuthPass(e.target.value)} aria-label="Service account password" />
+          </div>
+          <input className="field font-mono" placeholder="Login path (optional — e.g. /auth/login; found from the docs if blank)" value={loginPath} onChange={(e) => setLoginPath(e.target.value)} aria-label="Login path" />
+          <button
+            type="button"
+            onClick={runDiscover}
+            disabled={discovering}
+            className="border border-rule px-3 py-2 font-mono text-xs text-bone transition-colors hover:border-dust disabled:opacity-40"
+          >
+            {discovering ? "testing login…" : "Test & discover"}
+          </button>
+          {discoverMsg && (
+            <p className={`font-mono text-[0.62rem] ${loginRecipe ? "text-acid" : "text-ember"}`}>{discoverMsg}</p>
+          )}
         </div>
       )}
       {authType !== "none" && (
